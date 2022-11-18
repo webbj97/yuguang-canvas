@@ -2,15 +2,11 @@
 import { nextTick, ref, Ref, onMounted, initCustomFormatter } from 'vue'
 
 type Point = { x: number, y: number }
-type ParticleT = {
-    circle: Point
-    speed: Point
-    r: number
-}
 
 const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
 
+// 粒子类
 class Particle {
     #w = 0
     #h = 0
@@ -20,9 +16,6 @@ class Particle {
     constructor(w: number, h: number) {
         this.#w = w
         this.#h = h
-        this.init()
-    }
-    init() {
         this.circle = {
             x: randomIntBetween(0, this.#w),
             y: randomIntBetween(0, this.#h),
@@ -32,37 +25,45 @@ class Particle {
             y: Math.random() - 0.5,
         }
     }
+    // 使用init 还是 放在初始化里
+    // init() {
+    //     this.circle = {
+    //         x: randomIntBetween(0, this.#w),
+    //         y: randomIntBetween(0, this.#h),
+    //     }
+    //     this.speed = { // 方向+速度
+    //         x: Math.random() - 0.5,
+    //         y: Math.random() - 0.5,
+    //     }
+    // }
 }
-
+// Canvas面板类
 class Canvas {
     w = 0
     h = 0
     selector = '';
-    particles: Array<Particle> = []
+    particles: Particle[] = []
     canvasEle: HTMLCanvasElement
     containerEle: Element
     constructor(selector: string) {
-        // 初始化节点
+        // 初始化节点+数据
         this.selector = selector
-        this.canvasEle = document.getElementById('canvas') as HTMLCanvasElement;
         this.containerEle = document.querySelector(this.selector) as Element
+        this.canvasEle = document.getElementById('canvas') as HTMLCanvasElement;
+        const { clientWidth, clientHeight } = this.containerEle
+        this.w = this.canvasEle.width = clientWidth
+        this.h = this.canvasEle.height = clientHeight
         this.init()
     }
     init() {
-        // 初始化数据
-        this.w = this.containerEle.clientWidth
-        this.h = this.containerEle.clientHeight
+        // 这段放在什么位置合理？
         this.canvasEle.addEventListener('mousemove', (e) => {
             pointer.x = e.offsetX
             pointer.y = e.offsetY;
         })
-        if (this.canvasEle) {
-            this.canvasEle.width = this.w;
-            this.canvasEle.height = this.h;
-        }
-        this.createParticles()
+        this.initParticles()
     }
-    createParticles() {
+    initParticles() {
         for (let i = 0; i < 500; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
@@ -74,7 +75,7 @@ class Canvas {
                 return;
             }
             ctx.clearRect(0, 0, this.w, this.h);
-            this.particles.forEach((particle) => {
+            this.particles.forEach((particle, i) => {
                 const { speed, circle, r } = particle
                 const distance = getBetween(circle, pointer)
                 if (distance <= OFFSET && pointer.x < (this.w - r) && pointer.y < (this.h - r) && pointer.x > r && pointer.y > r) {
@@ -101,9 +102,21 @@ class Canvas {
                 ctx.arc(circle.x, circle.y, r, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.closePath();
+                this.particles.slice(i + 1).forEach((particle2) => {
+                    // 这里需不需要将连线的能力封装到粒子内
+                    // 如 particle.lineTo(particle2)
+                    const distance = getBetween(circle, particle.circle) // 统计粒子的距离
+                    if (distance <= OFFSET) {
+                        ctx.beginPath();
+                        ctx.moveTo(circle.x, circle.y);
+                        ctx.lineTo(particle.circle.x, particle.circle.y);
+                        ctx.lineWidth = 0.5;
+                        ctx.strokeStyle = `rgba(0, 0, 0, ${(OFFSET - distance) / OFFSET})`; // 利用距离动态线条颜色
+                        ctx.stroke()
+                    }
+                })
             })
             requestAnimationFrame(this.draw.bind(this));
-
         }
     }
 }
@@ -131,7 +144,6 @@ function init() {
 onMounted(() => {
     init();
 })
-
 </script>
 
 <template>

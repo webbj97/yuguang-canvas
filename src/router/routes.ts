@@ -5,6 +5,7 @@ import Canvas2 from "@/views/canvas/2.vue";
 import Canvas3 from "@/views/canvas/3.vue";
 import Canvas4 from "@/views/canvas/4.vue";
 import Canvas5 from "@/views/canvas/5.vue";
+import Canvas6 from "@/views/canvas/6.vue";
 
 const routes = [
     { path: "/", name: "首页", component: Home },
@@ -37,6 +38,11 @@ const routes = [
                 path: "5",
                 name: "canvas-5",
                 component: Canvas5,
+            },
+            {
+                path: "6",
+                name: "canvas-6",
+                component: Canvas6,
             },
         ],
     },
