@@ -33,9 +33,10 @@ function handleTo(nav: { name: string }) {
     z-index: 91;
     width: 100%;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     height: 56px;
-    padding: 0 24px;
+    padding: 0 48px;
     box-shadow: 0 0 1px rgb(0 0 0 / 30%);
     transition: all 0.2s;
 
@@ -45,8 +46,8 @@ function handleTo(nav: { name: string }) {
 
         .nav-item__list {
             display: none;
-            top: 22px;
-            left: 0;
+            top: 100%;
+            right: 0;
             position: absolute;
             width: 200px;
             padding: 6px 12px;

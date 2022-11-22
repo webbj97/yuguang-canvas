@@ -2,70 +2,69 @@
 import { nextTick, ref, Ref, onMounted } from 'vue'
 
 
-
-defineProps<{ msg: string }>()
-
-
 const state = ref({ name: 'yuguang', age: 25 })
 const count = ref(0)
 const object = { foo: ref(1) }
-const { foo } = object
-console.log('foo', foo, 'foo');
-
-
-
-// const array: Array<number> = []
 const arr: Ref<number[]> = ref([])
-
-console.log(count, typeof count, count.value);
-
-function add() {
-	console.log('渲染开始');
-	count.value++;
-	nextTick(() => {
-		console.log('渲染结束');
-		if (count.value > 5) {
-			count.value = 0
-			arr.value = []
-		}
-		handle()
-	})
-}
-
-function handle() {
-	arr.value.push(1)
-	console.log(arr);
-}
-
-function initCanvas() {
-	const canvas = <HTMLCanvasElement>document.getElementById('canvas');
-	const ctx = canvas.getContext('2d');
-	if (ctx) {
-		ctx.fillStyle = "rgb(200,0,0)";
-        ctx.fillRect (10, 10, 55, 50);
-
-        ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-        ctx.fillRect (30, 30, 55, 50);
-	}
-}
-
-onMounted(() => {
-	initCanvas()
-})
 
 </script>
 
 <template>
-	<h1>{{ msg }}</h1>
-
-	<div class="card">
-		<button type="button" @click="add">count is {{ count }}</button>
+	<div class="home-page">
+		<div class="accent">Canvas</div>
+		<p class="desc">Canvas API 提供了一个通过JavaScript 和 HTML的 <b>canvas</b>
+			元素来绘制图形的方式。它可以用于动画、游戏画面、数据可视化、图片编辑以及实时视频处理等方面。</p>
+		<section class="box-container">
+			<div class="vt-box">
+				<h2>常规Api使用</h2>
+			</div>
+			<div class="vt-box">
+				<h2>循序渐进的demo</h2>
+			</div>
+			<div class="vt-box">
+				<h2>粒子特效</h2>
+			</div>
+		</section>
 	</div>
-	<canvas id="canvas"></canvas>
 </template>
 
-<style scoped>
-.read-the-docs {
-	color: #888;
+<style lang="less" scoped>
+.home-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding-top: 10%;
+	padding-left: 48px;
+	padding-right: 48px;
+
+	.accent {
+		margin-bottom: 12px;
+		font-size: 48px;
+		line-height: 1;
+		font-weight: bold;
+		color: transparent;
+		background: linear-gradient(315deg, #42d392 25%, #647eff);
+		-webkit-background-clip: text;
+	}
+
+	.desc {
+		max-width: 960px;
+	}
+
+	.box-container {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		max-width: 960px;
+		margin: 0 auto;
+		color: rgba(60, 60, 60, .7);
+
+		&>div {
+			padding: 28px 36px;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: 500;
+		}
+	}
 }
 </style>
