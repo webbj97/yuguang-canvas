@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, initCustomFormatter } from 'vue'
+import { ref, Ref, onMounted, onUnmounted } from 'vue'
 
 const w = window.innerWidth / 2
 const h = window.innerHeight / 2
@@ -7,8 +7,8 @@ const config = {
 	x: w / 2,
 	y: h / 2
 }
-// const array: Array<number> = []
-// const arr: Ref<number[]> = ref([])
+let rAF: number
+
 function init() {
 	const canvasRef = document.getElementById('canvas') as HTMLCanvasElement;
 	const canvas = canvasRef;
@@ -46,13 +46,17 @@ function animate() {
 		ctx.fill();
 		ctx.closePath();
 
-		requestAnimationFrame(animate);
+		rAF = requestAnimationFrame(animate);
 	}
 }
 
 onMounted(() => {
 	init();
 	animate()
+})
+
+onUnmounted(() => {
+	cancelAnimationFrame(rAF)
 })
 
 </script>

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, initCustomFormatter } from 'vue'
+import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue'
 
 type Point = { x: number, y: number }
 
 const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
+let rAF: number;
 
 // 粒子类
 class Particle {
@@ -97,7 +98,7 @@ class Canvas {
         this.initParticles()
     }
     initParticles() {
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 400; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
     }
@@ -120,7 +121,7 @@ class Canvas {
             })
         })
 
-        requestAnimationFrame(() => this.draw());
+        rAF = requestAnimationFrame(() => this.draw());
     }
 }
 
@@ -145,10 +146,14 @@ function init() {
     canvas.draw();
 }
 
-
 onMounted(() => {
     init();
 })
+
+onUnmounted(() => {
+    cancelAnimationFrame(rAF)
+})
+
 </script>
 
 <template>

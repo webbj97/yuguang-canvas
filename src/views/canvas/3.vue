@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, initCustomFormatter } from 'vue'
+import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue'
 
 const r = 50; // 半径
 const config = { x: r, y: r } // 起始坐标
 let w = 0 // 画板宽
 let h = 0 // 画板高
+let rAF: number
 const speed = { // 方向+速度
     x: 5,
     y: 5,
 };
 
-
-// const array: Array<number> = []
-// const arr: Ref<number[]> = ref([])
 function init() {
     const ele = document.querySelector('.page-canvas-3') as Element
     w = ele.clientWidth
@@ -57,7 +55,7 @@ function animate() {
         ctx.fill();
         ctx.closePath();
 
-        requestAnimationFrame(animate);
+        rAF = requestAnimationFrame(animate);
     }
 }
 
@@ -65,6 +63,11 @@ onMounted(() => {
     init();
     animate()
 })
+
+onUnmounted(() => {
+    cancelAnimationFrame(rAF)
+})
+
 
 </script>
 

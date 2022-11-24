@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, initCustomFormatter } from 'vue'
+import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue'
 
 type Point = { x: number, y: number }
 type ParticleT = {
@@ -10,6 +10,7 @@ type ParticleT = {
 
 const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
+let rAF: number
 
 class Particle {
     #w = 0
@@ -102,8 +103,7 @@ class Canvas {
                 ctx.fill();
                 ctx.closePath();
             })
-            requestAnimationFrame(this.draw.bind(this));
-
+            rAF = requestAnimationFrame(this.draw.bind(this));
         }
     }
 }
@@ -127,9 +127,12 @@ function init() {
     canvas.draw();
 }
 
-
 onMounted(() => {
     init();
+})
+
+onUnmounted(() => {
+    cancelAnimationFrame(rAF)
 })
 
 </script>

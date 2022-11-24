@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue'
+import { nextTick, ref, Ref, onMounted, initCustomFormatter, onBeforeMount, onBeforeUnmount, onUnmounted } from 'vue'
 
 type Point = { x: number, y: number }
-const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
-let rAF: number
+const pointer = { x: 0, y: 0 };
+let rAF: number;
 
 const randomColor = (): string => {
     return `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
@@ -14,55 +14,41 @@ const randomColor = (): string => {
 class Particle {
     #w = 0
     #h = 0
-    circle: Point = { x: 0, y: 0 }
-    speed: Point = { x: 0, y: 0 }
-    r = 2
-    color: string
+    x = 0
+    y = 0
+    color: string = randomColor()
+    lastPointer: Point
+    radius = Math.random() * 3 + 1
+    radians = Math.random() * (Math.PI * 2)
+    distanceFromCenter = randomIntBetween(50, 120);
+    velocity = 0.05
     constructor(w: number, h: number) {
         this.#w = w
         this.#h = h
-        this.circle = {
-            x: randomIntBetween(0, this.#w),
-            y: randomIntBetween(0, this.#h),
-        }
-        this.color = randomColor();
-        this.speed = { // 方向+速度
-            x: Math.random() - 0.5,
-            y: Math.random() - 0.5,
-        }
+        this.x = w / 2
+        this.y = h / 2
+        this.lastPointer = { x: this.x, y: this.y }
     }
-    update(ctx: CanvasRenderingContext2D, w: number, h: number) {
-        const { circle, speed } = this;
-        const distance = getBetween(circle, pointer)
-        // && pointer.x < (w - r)
-        //     && pointer.y < (h - r)
-        //     && pointer.x > r
-        //     && pointer.y > r
-        if (distance <= OFFSET) {
-            if (this.r < 40) {
-                this.r += 1;
-            }
-        } else if (this.r > 2) {
-            this.r -= 1;
-        }
-        circle.x += speed.x;
-        circle.y += speed.y;
-        // 边界碰撞反弹
-        if (circle.x > (w - this.r) || circle.x < this.r) {
-            speed.x *= -1;
-        }
-        if (circle.y > (h - this.r) || circle.y < this.r) {
-            speed.y *= -1;
-        }
+    update(ctx: CanvasRenderingContext2D) {
+        // 缓存上一次的位置形成轨迹
+        const lastPos = { x: this.x, y: this.y };
+        this.lastPointer.x += (pointer.x - this.lastPointer.x) * 0.05;
+        this.lastPointer.y += (pointer.y - this.lastPointer.y) * 0.05;
+        // 计算切角
+        this.radians += this.velocity;
+        this.x = this.lastPointer.x + Math.cos(this.radians) * this.distanceFromCenter;
+        this.y = this.lastPointer.y + Math.sin(this.radians) * this.distanceFromCenter;
 
-        this.draw(ctx)
+        this.draw(ctx, lastPos);
     }
-    draw(ctx: CanvasRenderingContext2D) {
-        const { circle, r, } = this;
+
+    draw(ctx: CanvasRenderingContext2D, lastPos: Point) {
         ctx.beginPath();
-        ctx.arc(circle.x, circle.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = this.color
-        ctx.fill();
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(this.x, this.y);
+        ctx.lineWidth = this.radius;
+        ctx.strokeStyle = this.color;
+        ctx.stroke();
         ctx.closePath();
     }
 }
@@ -82,6 +68,8 @@ class Canvas {
         this.w = this.canvasEle.width = this.containerEle.clientWidth
         this.h = this.canvasEle.height = this.containerEle.clientHeight
         // event
+        pointer.x = this.w / 2
+        pointer.y = this.h / 2
         this.canvasEle.addEventListener('mousemove', (e) => {
             pointer.x = e.offsetX
             pointer.y = e.offsetY;
@@ -89,7 +77,7 @@ class Canvas {
         this.initParticles()
     }
     initParticles() {
-        for (let i = 0; i < 300; i++) {
+        for (let i = 0; i < 40; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
     }
@@ -101,25 +89,15 @@ class Canvas {
         if (!ctx) {
             return;
         }
-        ctx.clearRect(0, 0, this.w, this.h);
-        this.particles.forEach((particle, i) => {
-            const { speed, circle, r } = particle
-            // 更新粒子
-            particle.update(ctx, this.w, this.h);
-        })
-
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.fillRect(0, 0, this.w, this.h);
+        this.particles.forEach((particle) => particle.update(ctx))
         rAF = requestAnimationFrame(() => this.draw());
     }
 }
 
 function randomIntBetween(min: number, max: number) {
     return Math.floor((Math.random() * (max - min)) + min + 1);
-}
-
-function getBetween(a: Point, b: Point) {
-    const distanceX = Math.abs(a.x - b.x);
-    const distanceY = Math.abs(a.y - b.y);
-    return Math.sqrt(distanceX ** 2 + distanceY ** 2);
 }
 
 function init() {
@@ -132,7 +110,6 @@ function init() {
 onMounted(() => {
     init();
 })
-
 onUnmounted(() => {
     cancelAnimationFrame(rAF)
 })
@@ -142,9 +119,9 @@ onUnmounted(() => {
 <template>
     <div class="page-canvas-6">
         <p>随机生成若干速率的小球</p>
-        <p>判断偏移量在合理范围，控制小球</p>
-        <p>上下左右边界检测</p>
-        <p>鼠标吸附效果</p>
+        <p>合理压缩小球反弹空间</p>
+        <p>反弹后衰减小球速率</p>
+        <p>边界碰撞</p>
         <canvas id="canvas"></canvas>
     </div>
 </template>

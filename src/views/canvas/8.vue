@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, initCustomFormatter } from 'vue'
+import { ref, Ref, onMounted, onUnmounted } from 'vue'
 
 type Point = { x: number, y: number }
 const OFFSET = 50;
+let rAF: number;
 
 const randomColor = (): string => {
     return `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
@@ -78,7 +79,6 @@ class Canvas {
         for (let i = 0; i < 50; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
-        console.log('this.particles', this.particles);
     }
     draw() {
         if (!this.canvasEle) {
@@ -94,7 +94,7 @@ class Canvas {
             particle.draw(ctx); // 绘制粒子
         })
 
-        requestAnimationFrame(() => this.draw());
+        rAF = requestAnimationFrame(() => this.draw());
     }
 }
 
@@ -108,9 +108,12 @@ function init() {
     canvas.draw();
 }
 
-
 onMounted(() => {
     init();
+})
+
+onUnmounted(() => {
+    cancelAnimationFrame(rAF)
 })
 </script>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref } from 'vue';
-import { useRouter } from 'vue-router'
+import { nextTick, ref, Ref, computed } from 'vue';
+import { useRouter } from "vue-router";
 import routes from '../../../router/routes';
 
 const router = useRouter()
@@ -11,6 +11,13 @@ function handleTo(nav: { name: string }) {
     router.push({ name: nav.name })
 }
 
+const activeName = computed(() => {
+    return router.currentRoute.value.name
+})
+
+console.log(activeName.value);
+
+
 </script>
 
 <template>
@@ -18,7 +25,10 @@ function handleTo(nav: { name: string }) {
         <div v-for="nav in routeList" :key="nav.name" class="nav-item">
             <span class="nav-item__label" @click="handleTo(nav)"> {{ nav.name }} </span>
             <div class="nav-item__list" v-if="nav.children?.length">
-                <span v-for="child in nav.children" @click.native="handleTo(child)">{{ child.name }}</span>
+                <span v-for="child in nav.children" :class="{ active: activeName === child.name }"
+                    @click.native="handleTo(child)">
+                    {{ child.name }}
+                </span>
             </div>
         </div>
     </div>
@@ -33,7 +43,6 @@ function handleTo(nav: { name: string }) {
     z-index: 91;
     width: 100%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     height: 56px;
     padding: 0 48px;
@@ -47,7 +56,7 @@ function handleTo(nav: { name: string }) {
         .nav-item__list {
             display: none;
             top: 100%;
-            right: 0;
+            left: 0;
             position: absolute;
             width: 200px;
             padding: 6px 12px;
@@ -74,6 +83,11 @@ function handleTo(nav: { name: string }) {
                         color: #535bf2;
                         cursor: pointer;
                     }
+                }
+
+                span.active {
+                    color: #535bf2;
+
                 }
             }
         }

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, initCustomFormatter } from 'vue'
+import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue'
 
 const r = 50; // 半径
 const config = { x: r, y: r } // 起始坐标
 let w = 0 // 画板宽
 let h = 0 // 画板高
+let rAF: number
 const speed = { // 方向+速度
     x: 2,
     y: 2,
@@ -74,13 +75,17 @@ function animate() {
         ctx.fill();
         ctx.closePath();
 
-        requestAnimationFrame(animate);
+        rAF = requestAnimationFrame(animate);
     }
 }
 
 onMounted(() => {
     init();
     animate()
+})
+
+onUnmounted(() => {
+    cancelAnimationFrame(rAF)
 })
 
 </script>
