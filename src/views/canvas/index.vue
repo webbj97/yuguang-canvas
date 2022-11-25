@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref } from 'vue'
+// import {ref } from 'vue'
 
 // defineProps<{ msg: string }>()
-
-const state = ref({ name: 'yuguang', age: 25 })
-const count = ref(0)
-
 
 </script>
 

@@ -3,20 +3,16 @@ import { nextTick, ref, Ref, computed } from 'vue';
 import { useRouter } from "vue-router";
 import routes from '../../../router/routes';
 
-const router = useRouter()
-// defineProps<{ msg: string }>()
+const router = useRouter();
+const routeList = ref(routes);
 
-const routeList = ref(routes)
 function handleTo(nav: { name: string }) {
-    router.push({ name: nav.name })
+    router.push({ name: nav.name });
 }
 
 const activeName = computed(() => {
-    return router.currentRoute.value.name
+    return router.currentRoute.value.name;
 })
-
-console.log(activeName.value);
-
 
 </script>
 
@@ -25,8 +21,11 @@ console.log(activeName.value);
         <div v-for="nav in routeList" :key="nav.name" class="nav-item">
             <span class="nav-item__label" @click="handleTo(nav)"> {{ nav.name }} </span>
             <div class="nav-item__list" v-if="nav.children?.length">
-                <span v-for="child in nav.children" :class="{ active: activeName === child.name }"
-                    @click.native="handleTo(child)">
+                <span 
+                    v-for="child in nav.children" 
+                    :class="{ active: activeName === child.name }"
+                    @click.native="handleTo(child)"
+                >
                     {{ child.name }}
                 </span>
             </div>
@@ -52,11 +51,13 @@ console.log(activeName.value);
     .nav-item {
         position: relative;
         margin-right: 20px;
-
+        &:first-child{
+            margin-right: auto;
+        }
         .nav-item__list {
             display: none;
             top: 100%;
-            left: 0;
+            right: 0;
             position: absolute;
             width: 200px;
             padding: 6px 12px;
@@ -91,8 +92,6 @@ console.log(activeName.value);
                 }
             }
         }
-
     }
-
 }
 </style>
