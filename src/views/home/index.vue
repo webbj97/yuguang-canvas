@@ -5,7 +5,10 @@ import { nextTick, ref, Ref, onMounted } from 'vue'
 const state = ref({ name: 'yuguang', age: 25 })
 const count = ref(0)
 const object = { foo: ref(1) }
-const arr: Ref<number[]> = ref([])
+const arr = [
+	{ action: '开始' },
+	{ action: '进阶' },
+]
 
 </script>
 
@@ -15,14 +18,8 @@ const arr: Ref<number[]> = ref([])
 		<p class="desc">Canvas API 提供了一个通过JavaScript 和 HTML的 <b>canvas</b>
 			元素来绘制图形的方式。它可以用于动画、游戏画面、数据可视化、图片编辑以及实时视频处理等方面。</p>
 		<section class="box-container">
-			<div class="vt-box">
-				<h2>常规Api使用</h2>
-			</div>
-			<div class="vt-box">
-				<h2>循序渐进的demo</h2>
-			</div>
-			<div class="vt-box">
-				<h2>粒子特效</h2>
+			<div class="vt-box" v-for="item in arr">
+				{{ item.action }}
 			</div>
 		</section>
 	</div>
@@ -54,16 +51,22 @@ const arr: Ref<number[]> = ref([])
 	.box-container {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: space-between;
 		max-width: 960px;
 		margin: 0 auto;
+		gap: 30px;
 		color: rgba(60, 60, 60, .7);
 
 		&>div {
-			padding: 28px 36px;
+			padding: 18px 36px;
 			border-radius: 8px;
+			font-size: 20px;
 			font-size: 14px;
 			font-weight: 500;
+
+			&:hover {
+				cursor: pointer;
+				background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+			}
 		}
 	}
 }

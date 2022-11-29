@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
 
 const config = {
 	w: window.innerWidth / 2,
@@ -18,6 +18,12 @@ function init() {
 	}
 }
 
+const max = 300;
+const min = 0;
+const base = reactive({
+	x: min + 30, y: min + 30, width: 100, height: 100
+})
+
 function animate() {
 	const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 	if (canvas) {
@@ -25,10 +31,10 @@ function animate() {
 		if (!ctx) {
 			return;
 		}
-
+		ctx.clearRect(0, 0, config.w, config.h)
 		ctx.fillStyle = "rgba(0, 0, 200, 0.2)";
-		ctx.fillRect(0, 0, config.w, config.h);
-		ctx.strokeRect(25, 25, config.w - 50, config.h - 50)
+		ctx.fillRect(base.x, base.y, base.width, base.height);
+		ctx.strokeRect(base.x, base.y, base.width, base.height)
 	}
 }
 
@@ -37,21 +43,74 @@ onMounted(() => {
 	animate()
 })
 
+watch(
+	() => base,
+	(count, prevCount) => {
+		console.log("变动");
+		animate();
+	},
+	{ deep: true }
+)
+
 </script>
 
 <template>
 	<div class="page-canvas-1">
 		<p>渲染上下文：ctx</p>
 		<p>填充颜色：ctx.fillStyle</p>
-		<p>绘制矩形：ctx.fillRect</p>
-		<p>绘制矩形：ctx.strokeRect</p>
+		<p>绘制矩形：ctx.fillRect（{{ base.x }}, {{ base.y }}, {{ base.width }}, {{ base.height }}）</p>
+		<p>绘制矩形：ctx.strokeRect（x, y, width, height）</p>
 		<canvas id="canvas"></canvas>
+
+		<div class="wrapper">
+			<h2>控制面板（fillRect  /  strokeRect）</h2>
+			<div class="row">
+				<label>x：</label>
+				<a-slider id="test" :max="max" :min="min" v-model:value="base.x" />
+			</div>
+			<div class="row">
+				<label>y：</label>
+				<a-slider id="test" :max="max" :min="min" v-model:value="base.y" />
+			</div>
+			<div class="row">
+				<label>width：</label>
+				<a-slider id="test" :max="max" :min="min" v-model:value="base.width" />
+			</div>
+			<div class="row">
+				<label>height：</label>
+				<a-slider id="test" :max="max" :min="min" v-model:value="base.height" />
+			</div>
+		</div>
 	</div>
 
 </template>
 
-<style scoped>
+<style lang="less" scoped>
 .page-canvas-1 {
-	padding: 24px
+	position: relative;
+	padding: 24px;
+
+	.wrapper {
+		padding: 20px;
+		width: 400px;
+		top: 20px;
+		right: 20px;
+		position: absolute;
+		background: #ccc;
+		border-radius: 16px;
+
+		.row {
+			display: flex;
+			align-items: center;
+		}
+
+		.ant-slider {
+			width: 300px;
+		}
+
+		label {
+			width: 55px
+		}
+	}
 }
 </style>
