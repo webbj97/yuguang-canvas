@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "strict": true,
+    "allowJs": true, // 允许引入js
     "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": true,

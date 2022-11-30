@@ -7,7 +7,11 @@ import Header from './views/components/header/index.vue'
 <template>
 	<Header />
 	<div class="app-main-container">
-		<router-view />
+		<Transition name="fade" mode="out-in">
+			<router-view v-slot="{ Component }">
+				<component :is="Component" />
+			</router-view>
+		</Transition>
 	</div>
 </template>
 
@@ -16,7 +20,8 @@ import Header from './views/components/header/index.vue'
 	padding-top: 56px;
 	height: 100vh;
 	width: 100%;
-	.app-main-container{
+
+	.app-main-container {
 		height: 100%;
 		overflow-y: auto;
 	}
@@ -28,5 +33,15 @@ import Header from './views/components/header/index.vue'
 
 .logo.vue:hover {
 	filter: drop-shadow(0 0 2em #42b883aa);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
 }
 </style>

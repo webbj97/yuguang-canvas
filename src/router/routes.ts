@@ -12,6 +12,8 @@ import Canvas9 from "@/views/canvas/9.vue";
 import Canvas10 from "@/views/canvas/10.vue";
 
 import CanvasB1 from "@/views/canvas-basic/1.vue";
+import CanvasB2 from "@/views/canvas-basic/2.vue";
+import CanvasB3 from "@/views/canvas-basic/3.vue";
 
 const routes = [
     { path: "/", name: "首页", component: Home },
@@ -22,8 +24,18 @@ const routes = [
         children: [
             {
                 path: "1",
-                name: "canvas-basic-1",
+                name: "矩形",
                 component: CanvasB1,
+            },
+            {
+                path: "2",
+                name: "线段/三角形",
+                component: CanvasB2,
+            },
+            {
+                path: "3",
+                name: "圆弧",
+                component: CanvasB3,
             },
         ],
     },

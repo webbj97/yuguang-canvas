@@ -21,7 +21,7 @@ function init() {
 const max = 300;
 const min = 0;
 const base = reactive({
-	x: min + 30, y: min + 30, width: 100, height: 100
+	x: min, y: min, width: 100, height: 100
 })
 
 function animate() {
@@ -55,32 +55,38 @@ watch(
 </script>
 
 <template>
-	<div class="page-canvas-1">
-		<p>渲染上下文：ctx</p>
-		<p>填充颜色：ctx.fillStyle</p>
-		<p>绘制矩形：ctx.fillRect（{{ base.x }}, {{ base.y }}, {{ base.width }}, {{ base.height }}）</p>
-		<p>绘制矩形：ctx.strokeRect（x, y, width, height）</p>
-		<canvas id="canvas"></canvas>
+	<div class="page-canvas-1 page-canvas">
+		<div class="page-canvas__left">
+			<p>渲染上下文：ctx</p>
+			<p>填充颜色：ctx.fillStyle</p>
+			<p>绘制矩形：ctx.fillRect（{{ base.x }}, {{ base.y }}, {{ base.width }}, {{ base.height }}）</p>
+			<p>绘制矩形：ctx.strokeRect（x, y, width, height）</p>
 
-		<div class="wrapper">
-			<h2>控制面板（fillRect  /  strokeRect）</h2>
-			<div class="row">
-				<label>x：</label>
-				<a-slider id="test" :max="max" :min="min" v-model:value="base.x" />
-			</div>
-			<div class="row">
-				<label>y：</label>
-				<a-slider id="test" :max="max" :min="min" v-model:value="base.y" />
-			</div>
-			<div class="row">
-				<label>width：</label>
-				<a-slider id="test" :max="max" :min="min" v-model:value="base.width" />
-			</div>
-			<div class="row">
-				<label>height：</label>
-				<a-slider id="test" :max="max" :min="min" v-model:value="base.height" />
+			<div class="wrapper">
+				<h2>控制面板（fillRect / strokeRect）</h2>
+				<div class="row">
+					<label>x：</label>
+					<a-slider id="test" :max="max" :min="min" v-model:value="base.x" />
+				</div>
+				<div class="row">
+					<label>y：</label>
+					<a-slider id="test" :max="max" :min="min" v-model:value="base.y" />
+				</div>
+				<div class="row">
+					<label>width：</label>
+					<a-slider id="test" :max="max" :min="min" v-model:value="base.width" />
+				</div>
+				<div class="row">
+					<label>height：</label>
+					<a-slider id="test" :max="max" :min="min" v-model:value="base.height" />
+				</div>
 			</div>
 		</div>
+		<div class="page-canvas__right">
+			<canvas id="canvas"></canvas>
+		</div>
+
+
 	</div>
 
 </template>
@@ -92,11 +98,8 @@ watch(
 
 	.wrapper {
 		padding: 20px;
-		width: 400px;
-		top: 20px;
-		right: 20px;
-		position: absolute;
-		background: #ccc;
+		width: 100%;
+		background: #a6afba;
 		border-radius: 16px;
 
 		.row {
@@ -111,6 +114,18 @@ watch(
 		label {
 			width: 55px
 		}
+	}
+}
+
+.page-canvas {
+	display: flex;
+
+	&__left {
+		width: 30%;
+	}
+
+	&__right {
+		margin-left: auto;
 	}
 }
 </style>

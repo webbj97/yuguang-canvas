@@ -6,8 +6,8 @@ const state = ref({ name: 'yuguang', age: 25 })
 const count = ref(0)
 const object = { foo: ref(1) }
 const arr = [
-	{ action: '开始' },
-	{ action: '进阶' },
+	{ action: '基础API' },
+	{ action: '衍生动效' },
 ]
 
 </script>
@@ -35,7 +35,7 @@ const arr = [
 	padding-right: 48px;
 
 	.accent {
-		margin-bottom: 12px;
+		margin-bottom: 24px;
 		font-size: 48px;
 		line-height: 1;
 		font-weight: bold;
@@ -62,11 +62,6 @@ const arr = [
 			font-size: 20px;
 			font-size: 14px;
 			font-weight: 500;
-
-			&:hover {
-				cursor: pointer;
-				background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
-			}
 		}
 	}
 }
