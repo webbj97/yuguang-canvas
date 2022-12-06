@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, Ref, onMounted, onUnmounted } from 'vue'
+import { nextTick, ref, Ref, onMounted, initCustomFormatter, onBeforeMount, onBeforeUnmount, onUnmounted } from 'vue'
 
 type Point = { x: number, y: number }
 const OFFSET = 50;
+const pointer = { x: 0, y: 0 };
 let rAF: number;
 
 const randomColor = (): string => {
@@ -13,47 +14,41 @@ const randomColor = (): string => {
 class Particle {
     #w = 0
     #h = 0
-    r = randomIntBetween(10, 20)
-    circle: Point = { x: 0, y: 0 }
-    speed: Point = { x: 0, y: 0 }
+    x = 0
+    y = 0
     color: string = randomColor()
-    dx = randomIntBetween(-2, 2) // x速度
-    dy = 15 // 偏移量
+    lastPointer: Point
+    radius = Math.random() * 3 + 1
+    radians = Math.random() * (Math.PI * 2)
+    distanceFromCenter = randomIntBetween(50, 120);
+    velocity = 0.05
     constructor(w: number, h: number) {
         this.#w = w
         this.#h = h
-        this.circle = {
-            x: randomIntBetween(0, this.#w),
-            y: randomIntBetween(this.r, this.#h >> 1), // 上半区
-        }
+        this.x = w / 2
+        this.y = h / 2
+        this.lastPointer = { x: this.x, y: this.y }
     }
-    update(w: number, h: number) {
-        const { circle, r } = this;
+    update(ctx: CanvasRenderingContext2D) {
+        // 缓存上一次的位置形成轨迹
+        const lastPos = { x: this.x, y: this.y };
+        this.lastPointer.x += (pointer.x - this.lastPointer.x) * 0.05;
+        this.lastPointer.y += (pointer.y - this.lastPointer.y) * 0.05;
+        // 计算切角
+        this.radians += this.velocity;
+        this.x = this.lastPointer.x + Math.cos(this.radians) * this.distanceFromCenter;
+        this.y = this.lastPointer.y + Math.sin(this.radians) * this.distanceFromCenter;
 
-        // 边界碰撞反弹
-        if (circle.x < r || circle.x > w - r) {
-            this.dx *= -1;
-        }
-
-        if (circle.y >= h - r) {
-            this.dx *= 0.95;
-        }
-
-        if (circle.y > h - r - this.dy) {
-            this.dy *= -0.95;
-        } else {
-            this.dy += 1;
-        }
-
-        circle.x += this.dx;
-        circle.y += this.dy;
+        this.draw(ctx, lastPos);
     }
-    draw(ctx: CanvasRenderingContext2D) {
-        const { circle, r, } = this;
+
+    draw(ctx: CanvasRenderingContext2D, lastPos: Point) {
         ctx.beginPath();
-        ctx.arc(circle.x, circle.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = this.color
-        ctx.fill();
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(this.x, this.y);
+        ctx.lineWidth = this.radius;
+        ctx.strokeStyle = this.color;
+        ctx.stroke();
         ctx.closePath();
     }
 }
@@ -72,11 +67,17 @@ class Canvas {
         // number
         this.w = this.canvasEle.width = this.containerEle.clientWidth
         this.h = this.canvasEle.height = this.containerEle.clientHeight
-
+        // event
+        pointer.x = this.w / 2
+        pointer.y = this.h / 2
+        this.canvasEle.addEventListener('mousemove', (e) => {
+            pointer.x = e.offsetX
+            pointer.y = e.offsetY;
+        })
         this.initParticles()
     }
     initParticles() {
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 40; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
     }
@@ -88,12 +89,9 @@ class Canvas {
         if (!ctx) {
             return;
         }
-        ctx.clearRect(0, 0, this.w, this.h);
-        this.particles.forEach((particle, i) => {
-            particle.update(this.w, this.h); // 更新粒子
-            particle.draw(ctx); // 绘制粒子
-        })
-
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.fillRect(0, 0, this.w, this.h);
+        this.particles.forEach((particle) => particle.update(ctx))
         rAF = requestAnimationFrame(() => this.draw());
     }
 }
@@ -108,13 +106,14 @@ function init() {
     canvas.draw();
 }
 
+
 onMounted(() => {
     init();
 })
-
 onUnmounted(() => {
     cancelAnimationFrame(rAF)
 })
+
 </script>
 
 <template>

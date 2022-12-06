@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue'
+import { ref, Ref, onMounted, onUnmounted } from 'vue'
 
 type Point = { x: number, y: number }
-const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
-let rAF: number
+let rAF: number;
 
 const randomColor = (): string => {
     return `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
@@ -14,48 +13,40 @@ const randomColor = (): string => {
 class Particle {
     #w = 0
     #h = 0
+    r = randomIntBetween(10, 20)
     circle: Point = { x: 0, y: 0 }
     speed: Point = { x: 0, y: 0 }
-    r = 2
-    color: string
+    color: string = randomColor()
+    dx = randomIntBetween(-2, 2) // x速度
+    dy = 15 // 偏移量
     constructor(w: number, h: number) {
         this.#w = w
         this.#h = h
         this.circle = {
             x: randomIntBetween(0, this.#w),
-            y: randomIntBetween(0, this.#h),
-        }
-        this.color = randomColor();
-        this.speed = { // 方向+速度
-            x: Math.random() - 0.5,
-            y: Math.random() - 0.5,
+            y: randomIntBetween(this.r, this.#h >> 1), // 上半区
         }
     }
-    update(ctx: CanvasRenderingContext2D, w: number, h: number) {
-        const { circle, speed } = this;
-        const distance = getBetween(circle, pointer)
-        // && pointer.x < (w - r)
-        //     && pointer.y < (h - r)
-        //     && pointer.x > r
-        //     && pointer.y > r
-        if (distance <= OFFSET) {
-            if (this.r < 40) {
-                this.r += 1;
-            }
-        } else if (this.r > 2) {
-            this.r -= 1;
-        }
-        circle.x += speed.x;
-        circle.y += speed.y;
+    update(w: number, h: number) {
+        const { circle, r } = this;
+
         // 边界碰撞反弹
-        if (circle.x > (w - this.r) || circle.x < this.r) {
-            speed.x *= -1;
-        }
-        if (circle.y > (h - this.r) || circle.y < this.r) {
-            speed.y *= -1;
+        if (circle.x < r || circle.x > w - r) {
+            this.dx *= -1;
         }
 
-        this.draw(ctx)
+        if (circle.y >= h - r) {
+            this.dx *= 0.95;
+        }
+
+        if (circle.y > h - r - this.dy) {
+            this.dy *= -0.95;
+        } else {
+            this.dy += 1;
+        }
+
+        circle.x += this.dx;
+        circle.y += this.dy;
     }
     draw(ctx: CanvasRenderingContext2D) {
         const { circle, r, } = this;
@@ -81,15 +72,11 @@ class Canvas {
         // number
         this.w = this.canvasEle.width = this.containerEle.clientWidth
         this.h = this.canvasEle.height = this.containerEle.clientHeight
-        // event
-        this.canvasEle.addEventListener('mousemove', (e) => {
-            pointer.x = e.offsetX
-            pointer.y = e.offsetY;
-        })
+
         this.initParticles()
     }
     initParticles() {
-        for (let i = 0; i < 300; i++) {
+        for (let i = 0; i < 50; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
     }
@@ -103,9 +90,8 @@ class Canvas {
         }
         ctx.clearRect(0, 0, this.w, this.h);
         this.particles.forEach((particle, i) => {
-            const { speed, circle, r } = particle
-            // 更新粒子
-            particle.update(ctx, this.w, this.h);
+            particle.update(this.w, this.h); // 更新粒子
+            particle.draw(ctx); // 绘制粒子
         })
 
         rAF = requestAnimationFrame(() => this.draw());
@@ -116,18 +102,11 @@ function randomIntBetween(min: number, max: number) {
     return Math.floor((Math.random() * (max - min)) + min + 1);
 }
 
-function getBetween(a: Point, b: Point) {
-    const distanceX = Math.abs(a.x - b.x);
-    const distanceY = Math.abs(a.y - b.y);
-    return Math.sqrt(distanceX ** 2 + distanceY ** 2);
-}
-
 function init() {
     const canvas = new Canvas()
     canvas.init();
     canvas.draw();
 }
-
 
 onMounted(() => {
     init();
@@ -136,15 +115,14 @@ onMounted(() => {
 onUnmounted(() => {
     cancelAnimationFrame(rAF)
 })
-
 </script>
 
 <template>
     <div class="page-canvas-6">
         <p>随机生成若干速率的小球</p>
-        <p>判断偏移量在合理范围，控制小球</p>
-        <p>上下左右边界检测</p>
-        <p>鼠标吸附效果</p>
+        <p>合理压缩小球反弹空间</p>
+        <p>反弹后衰减小球速率</p>
+        <p>边界碰撞</p>
         <canvas id="canvas"></canvas>
     </div>
 </template>

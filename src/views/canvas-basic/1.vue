@@ -85,13 +85,23 @@ watch(
 		<div class="page-canvas__right">
 			<canvas id="canvas"></canvas>
 		</div>
-
-
 	</div>
-
 </template>
 
 <style lang="less" scoped>
+
+// @media (width: light) {
+//     :root {
+//         color: #213547;
+//         background-color: #ffffff;
+//     }
+//     a:hover {
+//         color: #747bff;
+//     }
+//     button {
+//         background-color: #f9f9f9;
+//     }
+// }
 .page-canvas-1 {
 	position: relative;
 	padding: 24px;
@@ -119,6 +129,7 @@ watch(
 
 .page-canvas {
 	display: flex;
+	flex-wrap: wrap;
 
 	&__left {
 		width: 30%;

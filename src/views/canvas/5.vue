@@ -2,16 +2,12 @@
 import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue'
 
 type Point = { x: number, y: number }
-type ParticleT = {
-    circle: Point
-    speed: Point
-    r: number
-}
 
 const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
-let rAF: number
+let rAF: number;
 
+// 粒子类
 class Particle {
     #w = 0
     #h = 0
@@ -21,9 +17,6 @@ class Particle {
     constructor(w: number, h: number) {
         this.#w = w
         this.#h = h
-        this.init()
-    }
-    init() {
         this.circle = {
             x: randomIntBetween(0, this.#w),
             y: randomIntBetween(0, this.#h),
@@ -33,78 +26,102 @@ class Particle {
             y: Math.random() - 0.5,
         }
     }
-}
+    update(ctx: CanvasRenderingContext2D, w: number, h: number) {
+        const { circle, r, speed } = this;
+        const distance = getBetween(circle, pointer)
+        if (distance <= OFFSET
+            && pointer.x < (w - r)
+            && pointer.y < (h - r)
+            && pointer.x > r
+            && pointer.y > r) {
+            if (circle.x !== pointer.x) {
+                circle.x = lerp(circle.x, pointer.x)
+            }
+            if (circle.y !== pointer.y) {
+                circle.y = lerp(circle.y, pointer.y)
+            }
+        } else {
+            circle.x += speed.x;
+            circle.y += speed.y;
 
+            // 边界碰撞反弹
+            if (circle.x > (w - r) || circle.x < r) {
+                speed.x *= -1;
+            }
+            if (circle.y > (h - r) || circle.y < r) {
+                speed.y *= -1;
+            }
+        }
+        this.draw(ctx)
+    }
+    draw(ctx: CanvasRenderingContext2D) {
+        const { circle, r, } = this;
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+    }
+    lineTo(ctx: CanvasRenderingContext2D, particle: Particle) {
+        const { circle, } = this;
+        const distance = getBetween(circle, particle.circle) // 统计粒子的距离
+        if (distance <= OFFSET) {
+            ctx.beginPath();
+            ctx.moveTo(circle.x, circle.y);
+            ctx.lineTo(particle.circle.x, particle.circle.y);
+            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `rgba(0, 0, 0, ${(OFFSET - distance) / OFFSET})`; // 利用距离动态线条颜色
+            ctx.stroke()
+        }
+    }
+
+}
+// Canvas面板类
 class Canvas {
     w = 0
     h = 0
-    selector = '';
-    particles: Array<Particle> = []
-    canvasEle: HTMLCanvasElement
-    containerEle: Element
-    constructor(selector: string) {
-        // 初始化节点
-        this.selector = selector
-        this.canvasEle = document.getElementById('canvas') as HTMLCanvasElement;
-        this.containerEle = document.querySelector(this.selector) as Element
-        this.init()
-    }
+    particles: Particle[] = []
+    canvasEle?: HTMLCanvasElement
+    containerEle?: Element
+    constructor() { }
     init() {
-        // 初始化数据
-        this.w = this.containerEle.clientWidth
-        this.h = this.containerEle.clientHeight
+        // dom
+        this.containerEle = document.querySelector('.page-canvas-6') as Element
+        this.canvasEle = document.getElementById('canvas') as HTMLCanvasElement;
+        // number
+        this.w = this.canvasEle.width = this.containerEle.clientWidth
+        this.h = this.canvasEle.height = this.containerEle.clientHeight
+        // event
         this.canvasEle.addEventListener('mousemove', (e) => {
             pointer.x = e.offsetX
             pointer.y = e.offsetY;
         })
-        if (this.canvasEle) {
-            this.canvasEle.width = this.w;
-            this.canvasEle.height = this.h;
-        }
-        this.createParticles()
+        this.initParticles()
     }
-    createParticles() {
+    initParticles() {
         for (let i = 0; i < 500; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
     }
     draw() {
-        if (this.canvasEle) {
-            const ctx = this.canvasEle.getContext('2d');
-            if (!ctx) {
-                return;
-            }
-            ctx.clearRect(0, 0, this.w, this.h);
-            this.particles.forEach((particle) => {
-                const { speed, circle, r } = particle
-                const distance = getBetween(circle, pointer)
-                if (distance <= OFFSET && pointer.x < (this.w - r) && pointer.y < (this.h - r) && pointer.x > r && pointer.y > r) {
-                    if (circle.x !== pointer.x) {
-                        circle.x = lerp(circle.x, pointer.x)
-                    }
-                    if (circle.y !== pointer.y) {
-                        circle.y = lerp(circle.y, pointer.y)
-                    }
-                } else {
-                    circle.x += speed.x;
-                    circle.y += speed.y;
-
-                    // 边界碰撞反弹
-                    if (circle.x > (this.w - r) || circle.x < r) {
-                        speed.x *= -1;
-                    }
-                    if (circle.y > (this.h - r) || circle.y < r) {
-                        speed.y *= -1;
-                    }
-                }
-
-                ctx.beginPath();
-                ctx.arc(circle.x, circle.y, r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.closePath();
-            })
-            rAF = requestAnimationFrame(this.draw.bind(this));
+        if (!this.canvasEle) {
+            return;
         }
+        const ctx = this.canvasEle.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+        ctx.clearRect(0, 0, this.w, this.h);
+        this.particles.forEach((particle, i) => {
+            const { speed, circle, r } = particle
+            // 更新粒子
+            particle.update(ctx, this.w, this.h);
+            // 聚合粒子
+            this.particles.slice(i + 1).forEach((particle2) => {
+                particle.lineTo(ctx, particle2)
+            })
+        })
+
+        rAF = requestAnimationFrame(() => this.draw());
     }
 }
 
@@ -123,7 +140,9 @@ function lerp(start: number, end: number) {
 }
 
 function init() {
-    const canvas = new Canvas('.page-canvas-3')
+    const canvas = new Canvas()
+    canvas.init();
+    console.log('canvas', canvas);
     canvas.draw();
 }
 
@@ -138,7 +157,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="page-canvas-3">
+    <div class="page-canvas-6">
         <p>随机生成若干速率的小球</p>
         <p>判断偏移量在合理范围，控制小球</p>
         <p>上下左右边界检测</p>
@@ -148,7 +167,7 @@ onUnmounted(() => {
 </template>
 
 <style lang="less" scoped>
-.page-canvas-3 {
+.page-canvas-6 {
     position: relative;
     min-height: 100%;
     padding: 24px;

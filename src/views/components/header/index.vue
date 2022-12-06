@@ -21,15 +21,13 @@ const activeName = computed(() => {
         <div v-for="nav in routeList" :key="nav.name" class="nav-item">
             <span class="nav-item__label" @click="handleTo(nav)"> {{ nav.name }} </span>
             <div class="nav-item__list" v-if="nav.children?.length">
-                <span 
-                    v-for="child in nav.children" 
-                    :class="{ active: activeName === child.name }"
-                    @click.native="handleTo(child)"
-                >
+                <span v-for="child in nav.children" :class="{ active: activeName === child.name }"
+                    @click.native="handleTo(child)">
                     {{ child.name }}
                 </span>
             </div>
         </div>
+        <a href="https://github.com/webbj97/yuguang-vite" target="_blank">star⭐️</a>
     </div>
 </template>
 
@@ -51,9 +49,11 @@ const activeName = computed(() => {
     .nav-item {
         position: relative;
         margin-right: 20px;
-        &:first-child{
+
+        &:first-child {
             margin-right: auto;
         }
+
         .nav-item__list {
             display: none;
             top: 100%;
@@ -92,6 +92,12 @@ const activeName = computed(() => {
                 }
             }
         }
+    }
+}
+@media screen and (max-width: 450px) {
+    .main-header {
+        padding-left: 2rem;
+        padding-right: 1rem;
     }
 }
 </style>

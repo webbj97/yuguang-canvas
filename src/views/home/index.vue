@@ -7,8 +7,21 @@ const count = ref(0)
 const object = { foo: ref(1) }
 const arr = [
 	{ action: '基础API' },
+	{ action: 'Canvas画板' },
 	{ action: '衍生动效' },
 ]
+
+interface funcType {
+	<T>(arg: T): T;
+}
+
+// type HelloWorld = any
+// type Equal<T, K> = T extends K ? true : false
+// type Expect = T
+
+// type test = Expect<Equal<HelloWorld, string>>
+// type test = Equal<HelloWorld, string>
+
 
 </script>
 
