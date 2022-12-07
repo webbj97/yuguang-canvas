@@ -60,6 +60,7 @@ class History {
         this.step = 0;
     }
     add(h: HistoryEntry) {
+        this.cacheQueue = this.cacheQueue.slice(0, this.currentStep)
         this.cacheQueue.push(h);
 
         this.step = this.getLength();
