@@ -5,25 +5,25 @@ import {
     DownloadOutlined,
     EyeOutlined,
     EyeInvisibleOutlined,
-    DeleteOutlined,
-    ArrowLeftOutlined,
-    ArrowRightOutlined
+    DeleteTwoTone,
+    LeftSquareTwoTone,
+    RightSquareTwoTone,
 } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-import { func } from 'vue-types';
+import { object } from 'vue-types';
 
 interface formT {
     type: string,
-    width: string,
-    color: string,
+    lineWidth: string,
+    strokeColor: string,
     activeDraw: number,
 }
 
-const canvasList: Canvas[] = reactive([])
-const form = reactive({
+const canvasList: PaintBoard[] = reactive([])
+const form: formT = reactive({
     type: 'pencil',
-    width: '2',
-    color: 'black',
+    lineWidth: '6',
+    strokeColor: 'black',
     activeDraw: 0,
 });
 
@@ -38,54 +38,78 @@ type Action = {
     method: 'drawArc'
 }
 
+// 记录类型
 interface HistoryEntry {
     lineWidth: number;
     strokeColor: string;
     actions: Action[];
 }
 
-let history: HistoryEntry[] = []
-
-
 let canvasRef = reactive({});
 
-const list: any[] = [];
+class History {
+    cacheQueue: HistoryEntry[] = []
+    currentStep = 0
+    step = 0
+    getLength() {
+        return this.cacheQueue.length;
+    }
+    reset() {
+        this.cacheQueue = [];
+        this.currentStep = 0;
+        this.step = 0;
+    }
+    add(h: HistoryEntry) {
+        this.cacheQueue.push(h);
 
-class Canvas {
+        this.step = this.getLength();
+        this.currentStep = this.getLength();
+    }
+    getCache(i: number) {
+        return this.cacheQueue[i]
+    }
+}
+
+
+class PaintBoard {
     ctx: CanvasRenderingContext2D
     canvas: HTMLCanvasElement
     moving = false
-    history: any[] = []
-    show = false
     currentStep = 0
-    historyEntry?: HistoryEntry
+    historyEntry: HistoryEntry | undefined
+    history = new History()
     constructor() {
-        // 加断言
+        // 布局 + 画板
         const wrapper = document.getElementById('wrapper') as HTMLElement;
         const rect = wrapper.getBoundingClientRect();
-
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement('canvas') as HTMLCanvasElement;
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         canvas.width = rect.width;
         canvas.height = rect.height;
-
+        // 示例 + 历史记录
         this.ctx = ctx;
         this.canvas = canvas;
-        this.show = true;
+        this.history = new History();
 
         wrapper.append(canvas)
         canvasList.push(this);
 
-        this.initHairPencil();
+        this.initListener();
     }
-    initHairPencil() {
-        this.canvas.addEventListener('mousedown', (point) => this.strokeStart(point));
-        this.canvas.addEventListener('mouseup', () => this.strokeEnd());
-        this.canvas.addEventListener('mousemove', (point) => this.stroke(point));
+    initListener() {
+        // this.canvas.addEventListener('mousedown', (point) => this.strokeStart(point));
+        // this.canvas.addEventListener('mouseup', () => this.strokeEnd());
+        // this.canvas.addEventListener('mousemove', (point) => this.stroke(point));
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        console.log('加载画笔完成...');
+        console.log('监听画笔完成...');
+
+        this.canvas.onpointerdown = (point) => this.strokeStart(point);
+        this.canvas.onpointermove = (point) => this.stroke(point);
+        this.canvas.onpointerup = () => this.strokeEnd();
+        this.canvas.onpointerleave = () => this.strokeEnd();
     }
+    // 监听画笔的三个方法，这段有点太重了
     strokeStart(point: MouseEvent) {
         const { offsetX: x, offsetY: y } = point;
         this.moving = true;
@@ -93,8 +117,9 @@ class Canvas {
         this.ctx.moveTo(x, y);
 
         const isPen = form.type === 'pencil';
-        const color = isPen ? form.color : '#fff';
-        const width = isPen ? +form.width : 10;
+        const color = isPen ? form.strokeColor : '#fff';
+        const width = isPen ? +form.lineWidth : 10;
+
         this.ctx.lineWidth = width;
         this.ctx.strokeStyle = color;
 
@@ -116,58 +141,11 @@ class Canvas {
         this.ctx.closePath();
         this.moving = false
         if (this.historyEntry) {
-            history.push(this.historyEntry);
-            this.currentStep = history.length;
+            this.history.add(this.historyEntry)
             this.historyEntry = undefined;
         }
-        console.log('历史记录', history);
     }
-    download() {
-        const url = this.canvas.toDataURL('image/png');
-        let a: HTMLAnchorElement | null = document.createElement('a'); // 生成一个a元素
-        a.href = url; // 将生成的URL设置为a.href属性
-        a.download = 'picture'; // 设置图片名称
-        const event = new MouseEvent('click'); // 创建一个单击事件
-        a.dispatchEvent(event); // 触发a的单击事件
-        a = null; // 置空
-    }
-    reload(clear?: true) {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (clear) {
-            history = history.slice(0, 0)
-        }
-        console.log('重置完成...');
-    }
-    toggleShow() {
-        this.canvas.style.border = '1px solid red';
-    }
-    back() {
-        console.log('this.currentStep', this.currentStep);
-        if (this.currentStep - 1 >= 0) {
-            this.reload();
-            this.currentStep -= 1
-            for (let i = 0; i <= this.currentStep - 1; i++) {
-                this.draw(history[i])
-                console.log('绘制', i);
-            }
-        } else {
-            message.warning('没有啦~');
-        }
-    }
-    front() {
-        if (this.currentStep + 1 <= history.length) {
-            this.reload();
-            this.currentStep += 1;
-            for (let i = 0; i <= this.currentStep - 1; i++) {
-                this.draw(history[i])
-                console.log('绘制', i);
-            }
-        } else {
-            message.warning('没有啦~');
-        }
-
-    }
-
+    // 重绘
     draw(his: HistoryEntry) {
         const { actions, strokeColor, lineWidth } = his;
         const start = actions[0];
@@ -183,46 +161,60 @@ class Canvas {
         }
         this.ctx.closePath();
     }
-}
+    download() {
+        const url = this.canvas.toDataURL('image/png');
+        let a: HTMLAnchorElement | null = document.createElement('a'); // 生成一个a元素
+        a.href = url; // 将生成的URL设置为a.href属性
+        a.download = 'picture'; // 设置图片名称
+        const event = new MouseEvent('click'); // 创建一个单击事件
+        a.dispatchEvent(event); // 触发a的单击事件
+        a = null; // 置空
+    }
+    reset() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.history.reset();
+        console.log('重置完成...');
+    }
+    reload() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        console.log('清空画布完成...');
+    }
+    back() {
+        if (this.history.currentStep - 1 >= 0) {
+            this.reload();
+            this.history.currentStep -= 1
+            for (let i = 0; i <= this.history.currentStep - 1; i++) {
+                this.draw(this.history.getCache(i))
+            }
+        } else {
+            message.warning('没有啦~');
+        }
+    }
+    front() {
+        if (this.history.currentStep + 1 <= this.history.step) {
+            this.reload();
+            this.history.currentStep += 1;
+            for (let i = 0; i < this.history.currentStep; i++) {
+                this.draw(this.history.getCache(i))
+                console.log('绘制', i);
+            }
+        } else {
+            message.warning('没有啦~');
+        }
 
-function reload() {
-    if (canvasRef instanceof Canvas) {
-        canvasRef.reload(true);
     }
 }
 
-function download() {
-    if (canvasRef instanceof Canvas) {
-        canvasRef.download();
+// 临时方案
+type MethodName = 'back' | 'front' | 'reset' | 'download';
+function handleFunc<T extends MethodName>(method: T) {
+    if (canvasRef instanceof PaintBoard) {
+        canvasRef[method]();
     }
-}
-
-function back() {
-    if (canvasRef instanceof Canvas) {
-        canvasRef.back();
-    }
-}
-
-function front() {
-    if (canvasRef instanceof Canvas) {
-        canvasRef.front();
-    }
-}
-
-function add() {
-    new Canvas();
-}
-
-function toggleShow(item: Canvas) {
-    item.show = !item.show
-}
-
-function deleteLayer(idx: number) {
-    canvasList.splice(idx, 1)
 }
 
 onMounted(() => {
-    const canvas = new Canvas();
+    const canvas = new PaintBoard();
     canvasRef = canvas;
 })
 
@@ -242,33 +234,34 @@ onUnmounted(() => {
                 <label>菜单</label>
                 <div class="flex">
                     <a-tooltip placement="topLeft">
-                        <template #title>清除画布</template>
-                        <RedoOutlined @click.stop="reload" />
-                    </a-tooltip>
-                    <a-tooltip placement="topLeft">
-                        <template #title>导出图片</template>
-                        <DownloadOutlined @click.stop="download" />
-                    </a-tooltip>
-                    <a-tooltip placement="topLeft">
                         <template #title>回退</template>
-                        <ArrowLeftOutlined @click.stop="back" />
+                        <LeftSquareTwoTone @click.stop="handleFunc('back')" />
                     </a-tooltip>
                     <a-tooltip placement="topLeft">
                         <template #title>前进</template>
-                        <ArrowRightOutlined @click.stop="front" />
+                        <RightSquareTwoTone @click.stop="handleFunc('front')" />
+                    </a-tooltip>
+
+                    <a-tooltip placement="topLeft">
+                        <template #title>清除画布</template>
+                        <DeleteTwoTone @click.stop="handleFunc('reset')" />
+                    </a-tooltip>
+                    <a-tooltip placement="topLeft">
+                        <template #title>导出图片</template>
+                        <DownloadOutlined @click.stop="handleFunc('download')" />
                     </a-tooltip>
                 </div>
             </div>
             <div class="row">
                 <label>颜色</label>
                 <div class="flex">
-                    <a-input v-model:value="form.color" class="palette" type="color" placeholder="请输入合法颜色" />
-                    <span>{{ form.color }}</span>
+                    <a-input v-model:value="form.strokeColor" class="palette" type="color" placeholder="请输入合法颜色" />
+                    <span>{{ form.strokeColor }}</span>
                 </div>
             </div>
             <div class="row">
                 <label>粗细</label>
-                <a-radio-group v-model:value="form.width" button-style="solid">
+                <a-radio-group v-model:value="form.lineWidth" button-style="solid">
                     <a-radio-button value="2">2</a-radio-button>
                     <a-radio-button value="4">4</a-radio-button>
                     <a-radio-button value="6">6</a-radio-button>
@@ -318,7 +311,7 @@ onUnmounted(() => {
         width: 240px;
         position: absolute;
         background: #ECEFFF;
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 24px 12px;
 
         .flex {
@@ -348,6 +341,12 @@ onUnmounted(() => {
         .anticon {
             padding: 6px;
             font-size: 18px;
+            margin-right: 4px;
+
+            &:last-child {
+                margin-right: 0;
+                margin-left: auto;
+            }
         }
     }
 
