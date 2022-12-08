@@ -1,17 +1,57 @@
-# Vue 3 + TypeScript + Vite
+# Canvas drawing board
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+<img align=center src="./src/assets/demo.png" />
 
-## Recommended IDE Setup
+## 关于
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+* 带你了解Canvas的基本方法，看看它能延展出哪些有趣的效果，最后我们完成一个Canvas画板，并将它迭代到一定的高度吧！
+* Star⭐️ 不走丢哦~
 
-## Type Support For `.vue` Imports in TS
+<p align=center>Go -> <a href="https://webbj97.github.io/yuguang-canvas/" target="_blank">Canvas drawing board</a> </p>
+  
+## Installation
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+```js
+clone 仓库地址
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+cd 代码仓库
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
-# yuguang-vite
+yarn
+
+yarn dev
+```
+
+## 技术栈
+
+* 语言：Vue3、TypeScript、Less
+* 组件：Element-UI
+* 编辑器：VsCode
+
+## 进度
+
+* [ ] Canvas画板
+  * [ ] 基本画笔
+    * [x] 画笔
+    * [x] 画笔颜色
+    * [x] 画笔粗细
+    * [ ] 画笔粗细变化
+    * [x] 简易橡皮擦
+    * [ ] 橡皮擦优化
+  * [ ] 画布
+    * [x] 单画布 - 撤回
+    * [x] 单画布 - 前进
+    * [x] 单画布 - 导出图片
+    * [x] 单画布 - 重置
+    * [ ] 单画布 - 缩放
+    * [ ] 多画布叠加
+    * [ ] 多画布拖拽
+* [ ] 基本API
+  * [x] 矩形
+  * [x] 线段
+  * [ ] ...
+* [ ] 粒子动效
+  * [x] 粒子碰撞
+  * [x] 粒子关联
+  * [ ] ....
+* [ ] 移动端适配  
+

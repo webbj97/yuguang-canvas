@@ -6,8 +6,8 @@ const state = ref({ name: 'yuguang', age: 25 })
 const count = ref(0)
 const object = { foo: ref(1) }
 const arr = [
+	{ action: 'Canvas画笔' },
 	{ action: '基础API' },
-	{ action: 'Canvas画板' },
 	{ action: '衍生动效' },
 ]
 
@@ -15,23 +15,16 @@ interface funcType {
 	<T>(arg: T): T;
 }
 
-// type HelloWorld = any
-// type Equal<T, K> = T extends K ? true : false
-// type Expect = T
-
-// type test = Expect<Equal<HelloWorld, string>>
-// type test = Equal<HelloWorld, string>
-
-
 </script>
 
 <template>
 	<div class="home-page">
 		<div class="accent">Canvas</div>
 		<p class="desc">Canvas API 提供了一个通过JavaScript 和 HTML的 <b>canvas</b>
-			元素来绘制图形的方式。它可以用于动画、游戏画面、数据可视化、图片编辑以及实时视频处理等方面。</p>
+			元素来绘制图形的方式。</p>
+		<p class="desc">它可以用于动画、游戏画面、数据可视化、图片编辑以及实时视频处理等方面。</p>
 		<section class="box-container">
-			<div class="vt-box" v-for="item in arr">
+			<div class="vt-box" v-for="item in arr" :key="item.action">
 				{{ item.action }}
 			</div>
 		</section>
