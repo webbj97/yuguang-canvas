@@ -1,42 +1,49 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, reactive } from 'vue';
-import base1 from './data';
+import { onMounted, ref, watch, reactive } from 'vue'
+import { object } from 'vue-types';
 
-const config = {
-    w: window.innerWidth / 2,
-    h: window.innerHeight / 2
-}
+const position: { x: number, y: number } = { x: 0, y: 0 };
 
 function init() {
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            return;
-        }
-        canvas.width = config.w;
-        canvas.height = config.h;
-    }
+	const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+	const wrapper = document.getElementById('container') as HTMLElement;
+	const rect = wrapper.getBoundingClientRect();
+	console.log(rect);
+	Object.assign(position, {
+		x: rect.width,
+		y: rect.width,
+	})
+    base.max = rect.width;
+	if (canvas) {
+		const ctx = canvas.getContext('2d');
+		if (!ctx) {
+			return;
+		}
+		canvas.width = position.x;
+		canvas.height = position.y;
+	}
 }
 
 const options = [
     { label: '是', value: true },
     { label: '否', value: false },
 ];
-const max = 400;
-const min = 100;
+const config = reactive({
+	max: 300,
+    min: 50,
+})
 const base = reactive({
-    x: min, y: min, fill: false
+	x: config.min, y: config.min, fill: false
 })
 
-function animate() {
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            return;
-        }
-        ctx.clearRect(0, 0, config.w, config.h);
+function start() {
+	const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+	if (canvas) {
+		const ctx = canvas.getContext('2d');
+		if (!ctx) {
+			return;
+		}
+		ctx.clearRect(0, 0, config.x, config.y);
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(base.x, base.y);
@@ -49,94 +56,84 @@ function animate() {
         if (base.fill) {
             ctx.fill();
         }
-    }
+	}
 }
 
 onMounted(() => {
-    init();
-    animate();
+	init();
+	start()
 })
 
 watch(
-    () => base,
-    (count, prevCount) => {
-        console.log("变动");
-        animate();
-    },
-    { deep: true }
+	() => base,
+	(count, prevCount) => {
+		console.log("变动");
+		start();
+	},
+	{ deep: true }
 )
 
 </script>
 
 <template>
-    <div class="page-canvas-2 page-canvas">
-        <div class="page-canvas__left">
-            <p>渲染上下文：ctx</p>
-            <p>笔触起点：ctx.moveTo(0, 0);</p>
-            <p>画线1：ctx.lineTo({{ base.x }}, {{ base.y }});</p>
-            <p>画线2：ctx.lineTo(0, {{ base.y }});</p>
-            <p>画线3：ctx.lineTo({{ base.x }}, 0);</p>
-            <p>填充颜色：ctx.fillStyle</p>
-            <p>填充路径绘制区域：ctx.fill()</p>
-
-            <div class="wrapper">
+	<div class="page-canvas-2 page-canvas">
+		<div class="page-canvas__left">
+			<div class="wrapper">
                 <h2>控制面板</h2>
                 <div class="row">
                     <label>x：</label>
-                    <a-slider id="test" :max="max" :min="min" v-model:value="base.x" />
+                    <a-slider id="test" :max="config.max" :min="config.min" v-model:value="base.x" />
                 </div>
                 <div class="row">
                     <label>y：</label>
-                    <a-slider id="test" :max="max" :min="min" v-model:value="base.y" />
+                    <a-slider id="test" :max="config.max" :min="config.min" v-model:value="base.y" />
                 </div>
                 <div class="row">
                     <label>填充：</label>
                     <a-radio-group v-model:value="base.fill" :options="options" />
                 </div>
             </div>
-        </div>
-        <div class="page-canvas__right">
-            <canvas id="canvas"></canvas>
-        </div>
-    </div>
-
+		</div>
+		<div id="container">
+			<canvas id="canvas"></canvas>
+		</div>
+	</div>
 </template>
 
 <style lang="less" scoped>
 .page-canvas-2 {
-    position: relative;
-    padding: 24px;
+	position: relative;
+	padding: 24px;
 
-    .wrapper {
-        padding: 20px;
-        width: 100%;
-        background: #a6afba;
-        border-radius: 16px;
+	.wrapper {
+		padding: 20px;
+		width: 100%;
+		background: #ECEFFF;
+		border-radius: 16px;
 
-        .row {
-            display: flex;
-            align-items: center;
-        }
+		.row {
+			display: flex;
+			align-items: center;
+		}
 
-        .ant-slider {
-            width: 300px;
-        }
+		.ant-slider {
+			width: 300px;
+		}
 
-        label {
-            width: 55px
-        }
-    }
+		label {
+			width: 55px
+		}
+	}
 }
 
 .page-canvas {
-    display: flex;
-
-    &__left {
-        width: 30%;
-    }
-
-    &__right {
-        margin-left: auto;
-    }
+	&__left {
+		width: 30%;
+		min-width: 300px;
+	}
+	#container {
+		margin-top: 20px;
+		width: 100%;
+	}
 }
 </style>

@@ -21,8 +21,8 @@ const activeName = computed(() => {
         <div v-for="nav in routeList" :key="nav.name" class="nav-item">
             <a-tooltip placement="bottomLeft" trigger="click">
                 <span class="nav-item__label" @click="handleTo(nav)"> {{ nav.name }} </span>
-                <template slot="title">
-                    <div class="nav-item__list" v-if="nav.children?.length">
+                <template #title>
+                    <div class="nav-item__list" v-if="nav.children && nav.children.length">
                         <span v-for="child in nav.children" :class="{ active: activeName === child.name }"
                             @click.native="handleTo(child)">
                             {{ child.name }}

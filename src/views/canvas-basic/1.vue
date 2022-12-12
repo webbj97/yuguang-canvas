@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, reactive } from 'vue'
+import { object } from 'vue-types';
 
-const config = {
-	w: window.innerWidth / 2,
-	h: window.innerHeight / 2
-}
+const config: { x: number, y: number } = { x: 0, y: 0 };
 
 function init() {
 	const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+	const wrapper = document.getElementById('container') as HTMLElement;
+	const rect = wrapper.getBoundingClientRect();
+	console.log(rect);
+	Object.assign(config, {
+		x: rect.width,
+		y: rect.width,
+	})
 	if (canvas) {
 		const ctx = canvas.getContext('2d');
 		if (!ctx) {
 			return;
 		}
-		canvas.width = config.w;
-		canvas.height = config.h;
+		canvas.width = config.x;
+		canvas.height = config.y;
 	}
 }
 
@@ -24,30 +29,29 @@ const base = reactive({
 	x: min, y: min, width: 100, height: 100
 })
 
-function animate() {
+function start() {
 	const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 	if (canvas) {
 		const ctx = canvas.getContext('2d');
 		if (!ctx) {
 			return;
 		}
-		ctx.clearRect(0, 0, config.w, config.h)
+		ctx.clearRect(0, 0, config.x, config.y)
 		ctx.fillStyle = "rgba(0, 0, 200, 0.2)";
 		ctx.fillRect(base.x, base.y, base.width, base.height);
-		ctx.strokeRect(base.x, base.y, base.width, base.height)
 	}
 }
 
 onMounted(() => {
 	init();
-	animate()
+	start()
 })
 
 watch(
 	() => base,
 	(count, prevCount) => {
 		console.log("变动");
-		animate();
+		start();
 	},
 	{ deep: true }
 )
@@ -57,13 +61,8 @@ watch(
 <template>
 	<div class="page-canvas-1 page-canvas">
 		<div class="page-canvas__left">
-			<p>渲染上下文：ctx</p>
-			<p>填充颜色：ctx.fillStyle</p>
-			<p>绘制矩形：ctx.fillRect（{{ base.x }}, {{ base.y }}, {{ base.width }}, {{ base.height }}）</p>
-			<p>绘制矩形：ctx.strokeRect（x, y, width, height）</p>
-
 			<div class="wrapper">
-				<h2>控制面板（fillRect / strokeRect）</h2>
+				<h4>fillRect（{{ base.x }}, {{ base.y }}, {{ base.width }}, {{ base.height }}）</h4>
 				<div class="row">
 					<label>x：</label>
 					<a-slider id="test" :max="max" :min="min" v-model:value="base.x" />
@@ -82,14 +81,13 @@ watch(
 				</div>
 			</div>
 		</div>
-		<div class="page-canvas__right">
+		<div id="container">
 			<canvas id="canvas"></canvas>
 		</div>
 	</div>
 </template>
 
 <style lang="less" scoped>
-
 // @media (width: light) {
 //     :root {
 //         color: #213547;
@@ -109,7 +107,7 @@ watch(
 	.wrapper {
 		padding: 20px;
 		width: 100%;
-		background: #a6afba;
+		background: #ECEFFF;
 		border-radius: 16px;
 
 		.row {
@@ -128,15 +126,13 @@ watch(
 }
 
 .page-canvas {
-	display: flex;
-	flex-wrap: wrap;
-
 	&__left {
 		width: 30%;
+		min-width: 300px;
 	}
-
-	&__right {
-		margin-left: auto;
+	#container {
+		margin-top: 20px;
+		width: 100%;
 	}
 }
 </style>
