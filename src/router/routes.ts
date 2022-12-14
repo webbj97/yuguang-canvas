@@ -13,6 +13,10 @@ import Canvas9 from "@/views/canvas/9.vue";
 import CanvasB1 from "@/views/canvas-basic/1.vue";
 import CanvasB2 from "@/views/canvas-basic/2.vue";
 import CanvasB3 from "@/views/canvas-basic/3.vue";
+import CanvasB4 from "@/views/canvas-basic/4.vue";
+import CanvasB5 from "@/views/canvas-basic/5.vue";
+import CanvasB6 from "@/views/canvas-basic/6.vue";
+import CanvasB7 from "@/views/canvas-basic/7.vue";
 
 import CanvasP1 from "@/views/canvas-palette/1.vue"
 
@@ -42,13 +46,33 @@ const routes = [
             },
             {
                 path: "2",
-                name: "线段/三角形",
+                name: "圆弧",
                 component: CanvasB2,
             },
             {
                 path: "3",
-                name: "圆弧",
+                name: "线段/三角形",
                 component: CanvasB3,
+            },
+            {
+                path: "4",
+                name: "矩形线段",
+                component: CanvasB4,
+            },
+            {
+                path: "5",
+                name: "图片",
+                component: CanvasB5,
+            },
+            {
+                path: "6",
+                name: "文字",
+                component: CanvasB6,
+            },
+            {
+                path: "7",
+                name: "阴影",
+                component: CanvasB7,
             },
         ],
     },

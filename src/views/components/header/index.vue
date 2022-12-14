@@ -5,8 +5,10 @@ import routes from '../../../router/routes';
 
 const router = useRouter();
 const routeList = ref(routes);
+let showNav = ref(false);
 
 function handleTo(nav: { name: string }) {
+    showNav.value = !showNav.value
     router.push({ name: nav.name });
 }
 
@@ -19,14 +21,14 @@ const activeName = computed(() => {
 <template>
     <div class="main-header">
         <div v-for="nav in routeList" :key="nav.name" class="nav-item">
-            <a-tooltip placement="bottomLeft" trigger="click">
+            <a-tooltip placement="bottomLeft" trigger="click" class="main-header-tooltip">
                 <span class="nav-item__label" @click="handleTo(nav)"> {{ nav.name }} </span>
                 <template #title>
                     <div class="nav-item__list" v-if="nav.children && nav.children.length">
-                        <span v-for="child in nav.children" :class="{ active: activeName === child.name }"
+                        <div v-for="child in nav.children" :class="['nav', { active: activeName === child.name }]"
                             @click.native="handleTo(child)">
                             {{ child.name }}
-                        </span>
+                        </div>
                     </div>
                 </template>
             </a-tooltip>
@@ -60,43 +62,20 @@ const activeName = computed(() => {
             margin-right: auto;
         }
 
-        .nav-item__list {
-            display: none;
-            top: 100%;
-            right: 0;
-            position: absolute;
-            width: 200px;
-            padding: 6px 12px;
-            overflow: scroll;
-            background: #fff;
-            box-shadow: 0 0 1px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.1),
-                0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: all .3s;
-        }
 
-        &:hover {
 
-            .nav-item__label {
-                color: #535bf2;
-                cursor: pointer;
-            }
+    }
+}
 
-            .nav-item__list {
-                display: flex;
-                flex-direction: column;
+.ant-tooltip-content {
 
-                span {
-                    &:hover {
-                        color: #535bf2;
-                        cursor: pointer;
-                    }
-                }
+    .ant-tooltip-arrow {
+        display: none;
+    }
 
-                span.active {
-                    color: #535bf2;
-
-                }
-            }
+    .ant-tooltip-inner {
+        .nav {
+            cursor: pointer;
         }
     }
 }

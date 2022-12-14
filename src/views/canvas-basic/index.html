@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+const canvas = document.getElementById('canvas'); 
+const ctx = canvas.getContext('2d');
+canvas.width=600;
+canvas.height=600
+
+ctx.moveTo(100, 100)
+ctx.lineTo(600, 100)
+
+ctx.shadowColor = '#ccc' // 设置阴影颜色
+ctx.shadowBlur = 3 // 设置阴影模糊度
+ctx.lineWidth = 6;
+
+ctx.shadowOffsetX = 10 // 向x轴正方向平移10像素
+ctx.shadowOffsetY = 10 // 向y轴正方向平移10像素
+
+ctx.stroke()
+// 绘制一个带阴影的矩形：
+ctx.fillRect(100, 150, 100, 50)
+// 绘制带阴影的文本：
+ctx.lineWidth = 1
+ctx.font = '30px Verdana'
+ctx.strokeText('Hello Canvas!', 300, 190, 400)
+// 绘制带阴影的圆：
+ctx.beginPath();
+
+ctx.shadowOffsetX = 20// 向x轴负方向平移20像素
+ctx.shadowOffsetY = 20 // 向y轴负方向平移20像素
+ctx.shadowColor = 'skyblue' // 设置阴影颜色为天蓝色
+ctx.shadowBlur = 9 // 设置阴影模糊度
+ctx.lineWidth = 5
+ctx.arc(350, 400, 100, 0, 2 * Math.PI)
+ctx.stroke()
+
+        // ctx.fill();
+        // ctx.stroke();
+    </script>
+</body>
+</html>

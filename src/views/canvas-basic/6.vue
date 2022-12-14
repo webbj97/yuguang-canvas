@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, watch, reactive } from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
+import { object } from 'vue-types';
 
 const config: { x: number, y: number } = { x: 0, y: 0 };
 
@@ -7,6 +8,7 @@ function init() {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const wrapper = document.getElementById('container') as HTMLElement;
     const rect = wrapper.getBoundingClientRect();
+    console.log(rect);
     Object.assign(config, {
         x: rect.width,
         y: rect.height,
@@ -21,43 +23,56 @@ function init() {
     }
 }
 
-const max = 100;
-const min = 0;
+const options = [
+    { label: 'left', value: 'left' },
+    { label: 'right', value: 'right' },
+    { label: 'center', value: 'center' },
+    { label: 'start', value: 'start' },
+    { label: 'end', value: 'end' },
+];
 const base = reactive({
-    r: max / 2
+    x: 300,
+    y: 50,
+    fill: false,
+    font: 50,
+    align: 'left'
 })
 
-function draw() {
+function start() {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     if (canvas) {
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             return;
         }
-        // 擦除一个矩形区域
-        ctx.clearRect(0, 0, config.x, config.y);
-        // 填充
-        // var gradient = ctx.createLinearGradient(0, 0, base.width, base.height);
-        // gradient.addColorStop(0, "green");
-        // gradient.addColorStop(1, "white");
-        // ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(base.r, base.r, base.r, 0, 2 * Math.PI);
-        ctx.fill();
+        ctx.clearRect(0, 0, config.x, config.y)
+        ctx.textAlign = base.align;
+        ctx.font = `${base.font}px serif`;
+        ctx.fillText('Canvas!', 200, 200, 400)
+
+        // 两条相互垂直的辅助线，两条线的交点为文本绘制的起始点：
+        ctx.beginPath()
+        ctx.moveTo(200, 0)
+        ctx.lineTo(200, 400)
+        ctx.setLineDash([10])
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.moveTo(0, 200)
+        ctx.lineTo(400, 200)
+        ctx.stroke()
     }
 }
 
 onMounted(() => {
     init();
-    draw();
-    console.log(111);
+    start()
 })
 
 watch(
     () => base,
     (count, prevCount) => {
         console.log("变动");
-        draw();
+        start();
     },
     { deep: true }
 )
@@ -65,12 +80,18 @@ watch(
 </script>
 
 <template>
-    <div class="page-canvas-2">
-        <div class="wrapper">
-            <h4>fillRect（{{ base.r }}, {{ base.r }}, {{ base.r }}, 0, 2π）</h4>
-            <div class="row">
-                <label>width：</label>
-                <a-slider id="test" :max="max" :min="min" v-model:value="base.r" />
+    <div class="page-canvas-6 page-canvas">
+        <div class="page-canvas__left">
+            <div class="wrapper">
+                <h2>控制面板</h2>
+                <div class="row">
+                    <label>大小：</label>
+                    <a-slider :max="80" :min="30" v-model:value="base.font" />
+                </div>
+                <div class="row">
+                    <label>对齐：</label>
+                    <a-radio-group v-model:value="base.align" :options="options" />
+                </div>
             </div>
         </div>
         <div id="container">
@@ -80,7 +101,7 @@ watch(
 </template>
 
 <style lang="less" scoped>
-.page-canvas-2 {
+.page-canvas-6 {
     position: relative;
     padding: 24px;
     height: 100%;
@@ -94,7 +115,9 @@ watch(
 
         .row {
             display: flex;
-            align-items: center;
+            label{
+                width: 100px;
+            }
         }
 
         .ant-slider {

@@ -8,6 +8,10 @@ type ParticleT = {
     r: number
 }
 
+const randomColor = (): string => {
+    return `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
+}
+
 const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
 let rAF: number
@@ -17,7 +21,8 @@ class Particle {
     #h = 0
     circle: Point = { x: 0, y: 0 }
     speed: Point = { x: 0, y: 0 }
-    r = 0.8
+    r = 30
+    color = randomColor()
     constructor(w: number, h: number) {
         this.#w = w
         this.#h = h
@@ -25,8 +30,8 @@ class Particle {
     }
     init() {
         this.circle = {
-            x: randomIntBetween(0, this.#w),
-            y: randomIntBetween(0, this.#h),
+            x: randomIntBetween(0 + this.r, this.#w - this.r),
+            y: randomIntBetween(0 + this.r, this.#h - this.r),
         }
         this.speed = { // 方向+速度
             x: Math.random() - 0.5,
@@ -47,7 +52,8 @@ class Canvas {
         this.selector = selector
         this.canvasEle = document.getElementById('canvas') as HTMLCanvasElement;
         this.containerEle = document.querySelector(this.selector) as Element
-        this.init()
+        this.init();
+
     }
     init() {
         // 初始化数据
@@ -64,7 +70,7 @@ class Canvas {
         this.createParticles()
     }
     createParticles() {
-        for (let i = 0; i < 500; i++) {
+        for (let i = 0; i < 50; i++) {
             this.particles.push(new Particle(this.w, this.h))
         }
     }
@@ -76,7 +82,7 @@ class Canvas {
             }
             ctx.clearRect(0, 0, this.w, this.h);
             this.particles.forEach((particle) => {
-                const { speed, circle, r } = particle
+                const { speed, circle, r, color } = particle
                 const distance = getBetween(circle, pointer)
                 if (distance <= OFFSET && pointer.x < (this.w - r) && pointer.y < (this.h - r) && pointer.x > r && pointer.y > r) {
                     if (circle.x !== pointer.x) {
@@ -100,7 +106,9 @@ class Canvas {
 
                 ctx.beginPath();
                 ctx.arc(circle.x, circle.y, r, 0, Math.PI * 2);
+                ctx.globalCompositeOperation = 'lighter';
                 ctx.fill();
+                ctx.fillStyle = color;
                 ctx.closePath();
             })
             rAF = requestAnimationFrame(this.draw.bind(this));
