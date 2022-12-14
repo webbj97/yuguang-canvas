@@ -46,7 +46,7 @@ function start() {
             return;
         }
         ctx.clearRect(0, 0, config.x, config.y)
-        ctx.textAlign = base.align;
+        ctx.textAlign = base.align as CanvasTextAlign;
         ctx.font = `${base.font}px serif`;
         ctx.fillText('Canvas!', 200, 200, 400)
 
