@@ -1,6 +1,6 @@
 import Home from "@/views/home/index.vue";
 // import Demo from "../views/canvas/index.vue";
-import Canvas1 from "@/views/canvas/1.vue";
+// import Canvas1 from "@/views/canvas/1.vue";
 import Canvas2 from "@/views/canvas/2.vue";
 import Canvas3 from "@/views/canvas/3.vue";
 import Canvas4 from "@/views/canvas/4.vue";
@@ -79,13 +79,13 @@ const routes = [
     {
         path: "/canvas",
         name: "canvas动效",
-        redirect: "/canvas/1",
+        redirect: "/canvas/2",
         children: [
-            {
-                path: "1",
-                name: "移动的球",
-                component: Canvas1,
-            },
+            // {
+            //     path: "1",
+            //     name: "移动的球",
+            //     component: Canvas1,
+            // },
             {
                 path: "2",
                 name: "移动的球（边界反弹）",
