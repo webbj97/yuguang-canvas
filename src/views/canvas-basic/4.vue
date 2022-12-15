@@ -23,10 +23,8 @@ function init() {
 	}
 }
 
-const max = 300;
-const min = 0;
 const base = reactive({
-	x: min, y: min, width: 100, height: 100
+	x: 150, y: 150, width: 100, height: 100, shadowBlur: 10
 })
 
 function start() {
@@ -36,13 +34,13 @@ function start() {
 		if (!ctx) {
 			return;
 		}
+		ctx.clearRect(0, 0, config.x, config.y);
 		ctx.beginPath();
 		ctx.shadowColor = '#d53'; // 阴影颜色
-		ctx.shadowBlur = 20; // 模糊效果程度的
-		ctx.lineJoin = 'round'; // 线段拐点样式(可忽略)
-		ctx.lineWidth = 15; // 线段宽度
+		ctx.shadowBlur = base.shadowBlur; // 模糊效果程度的
+		ctx.lineWidth = 5; // 线段宽度
 		ctx.strokeStyle = '#38f'; // 线段颜色
-		ctx.strokeRect(30, 30, 160, 90);
+		ctx.strokeRect(10, 10, base.x, base.y);
 	}
 }
 
@@ -63,25 +61,22 @@ watch(
 </script>
 
 <template>
-	<div class="page-canvas-1 page-canvas">
+	<div class="page-canvas-4 page-canvas">
 		<div class="page-canvas__left">
 			<div class="wrapper">
-				<h4>fillRect（{{ base.x }}, {{ base.y }}, {{ base.width }}, {{ base.height }}）</h4>
+				<h3>shadowBlur = {{ base.shadowBlur }}</h3>
 				<div class="row">
-					<label>x：</label>
-					<a-slider id="test" :max="max" :min="min" v-model:value="base.x" />
+					<label>模糊：</label>
+					<a-slider id="test" :max="20" :min="5" v-model:value="base.shadowBlur" />
 				</div>
-				<div class="row">
-					<label>y：</label>
-					<a-slider id="test" :max="max" :min="min" v-model:value="base.y" />
-				</div>
+				<h3>strokeRect(10, 10, {{ base.x }}, {{ base.y }})</h3>
 				<div class="row">
 					<label>width：</label>
-					<a-slider id="test" :max="max" :min="min" v-model:value="base.width" />
+					<a-slider id="test" :max="300" :min="100" v-model:value="base.x" />
 				</div>
 				<div class="row">
 					<label>height：</label>
-					<a-slider id="test" :max="max" :min="min" v-model:value="base.height" />
+					<a-slider id="test" :max="300" :min="100" v-model:value="base.y" />
 				</div>
 			</div>
 		</div>
@@ -92,25 +87,15 @@ watch(
 </template>
 
 <style lang="less" scoped>
-// @media (width: light) {
-//     :root {
-//         color: #213547;
-//         background-color: #ffffff;
-//     }
-//     a:hover {
-//         color: #747bff;
-//     }
-//     button {
-//         background-color: #f9f9f9;
-//     }
-// }
-.page-canvas-1 {
+.page-canvas-4 {
 	position: relative;
 	padding: 24px;
+	height: 100%;
 
 	.wrapper {
 		padding: 20px;
 		width: 100%;
+		max-width: 320px;
 		background: #ECEFFF;
 		border-radius: 16px;
 
@@ -124,20 +109,18 @@ watch(
 		}
 
 		label {
-			width: 55px
+			width: 55px;
+			flex-shrink: 0;
 		}
-	}
-}
-
-.page-canvas {
-	&__left {
-		width: 30%;
-		min-width: 300px;
 	}
 
 	#container {
-		margin-top: 20px;
 		width: 100%;
+		height: 100%;
+	}
+
+	#canvas {
+		margin-top: 20px;
 	}
 }
 </style>

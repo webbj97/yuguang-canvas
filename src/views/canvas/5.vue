@@ -7,6 +7,10 @@ const pointer = { x: 0, y: 0 };
 const OFFSET = 50;
 let rAF: number;
 
+const randomColor = (): string => {
+    return `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
+}
+
 // 粒子类
 class Particle {
     #w = 0
@@ -14,6 +18,7 @@ class Particle {
     circle: Point = { x: 0, y: 0 }
     speed: Point = { x: 0, y: 0 }
     r = 0.8
+    color = randomColor()
     constructor(w: number, h: number) {
         this.#w = w
         this.#h = h
@@ -55,9 +60,10 @@ class Particle {
         this.draw(ctx)
     }
     draw(ctx: CanvasRenderingContext2D) {
-        const { circle, r, } = this;
+        const { circle, r, color } = this;
         ctx.beginPath();
         ctx.arc(circle.x, circle.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.closePath();
     }
@@ -70,7 +76,7 @@ class Particle {
             ctx.lineTo(particle.circle.x, particle.circle.y);
             ctx.lineWidth = 0.5;
             ctx.strokeStyle = `rgba(0, 0, 0, ${(OFFSET - distance) / OFFSET})`; // 利用距离动态线条颜色
-            ctx.stroke()
+            ctx.stroke();
         }
     }
 

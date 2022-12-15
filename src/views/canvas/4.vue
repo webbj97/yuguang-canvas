@@ -148,9 +148,7 @@ onUnmounted(() => {
 <template>
     <div class="page-canvas-3">
         <p>随机生成若干速率的小球</p>
-        <p>判断偏移量在合理范围，控制小球</p>
-        <p>上下左右边界检测</p>
-        <p>鼠标吸附效果</p>
+        <p>常使用鼠标靠近小球吧？</p>
         <canvas id="canvas"></canvas>
     </div>
 </template>

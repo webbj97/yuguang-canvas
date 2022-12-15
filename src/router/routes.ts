@@ -1,6 +1,6 @@
 import Home from "@/views/home/index.vue";
 // import Demo from "../views/canvas/index.vue";
-// import Canvas1 from "@/views/canvas/1.vue";
+import Canvas1 from "@/views/canvas/1.vue";
 import Canvas2 from "@/views/canvas/2.vue";
 import Canvas3 from "@/views/canvas/3.vue";
 import Canvas4 from "@/views/canvas/4.vue";
@@ -16,9 +16,8 @@ import CanvasB3 from "@/views/canvas-basic/3.vue";
 import CanvasB4 from "@/views/canvas-basic/4.vue";
 import CanvasB5 from "@/views/canvas-basic/5.vue";
 import CanvasB6 from "@/views/canvas-basic/6.vue";
-import CanvasB7 from "@/views/canvas-basic/7.vue";
 
-import CanvasP1 from "@/views/canvas-palette/1.vue"
+import CanvasP1 from "@/views/canvas-palette/1.vue";
 
 const routes = [
     { path: "/", name: "首页", component: Home },
@@ -33,7 +32,7 @@ const routes = [
                 component: CanvasP1,
             },
         ],
-    },  
+    },
     {
         path: "/canvas-basic",
         name: "canvas基础",
@@ -41,51 +40,46 @@ const routes = [
         children: [
             {
                 path: "1",
-                name: "矩形",
+                name: "1.画一个矩形",
                 component: CanvasB1,
             },
             {
                 path: "2",
-                name: "圆弧",
+                name: "2.画一个圆弧",
                 component: CanvasB2,
             },
             {
                 path: "3",
-                name: "线段/三角形",
+                name: "3.画一个线段/三角形",
                 component: CanvasB3,
             },
             {
                 path: "4",
-                name: "矩形线段",
+                name: "4.画一个边框",
                 component: CanvasB4,
             },
             {
                 path: "5",
-                name: "图片",
+                name: "5.绘制文字",
                 component: CanvasB5,
             },
             {
                 path: "6",
-                name: "文字",
+                name: "6.添加阴影",
                 component: CanvasB6,
-            },
-            {
-                path: "7",
-                name: "阴影",
-                component: CanvasB7,
             },
         ],
     },
     {
         path: "/canvas",
-        name: "canvas动效",
-        redirect: "/canvas/2",
+        name: "canvas进阶",
+        redirect: "/canvas/1",
         children: [
-            // {
-            //     path: "1",
-            //     name: "移动的球",
-            //     component: Canvas1,
-            // },
+            {
+                path: "1",
+                name: "可拖动的球",
+                component: Canvas1,
+            },
             {
                 path: "2",
                 name: "移动的球（边界反弹）",
@@ -98,7 +92,7 @@ const routes = [
             },
             {
                 path: "4",
-                name: "移动的粒子（手指吸附）",
+                name: "移动的彩色粒子",
                 component: Canvas4,
             },
             {
@@ -121,11 +115,11 @@ const routes = [
                 name: "旋转",
                 component: Canvas8,
             },
-            {
-                path: "9",
-                name: "经典贪吃蛇",
-                component: Canvas9,
-            },
+            // {
+            //     path: "9",
+            //     name: "经典贪吃蛇",
+            //     component: Canvas9,
+            // },
         ],
     },
 ];

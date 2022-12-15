@@ -23,7 +23,7 @@ const activeName = computed(() => {
         <div v-for="nav in routeList" :key="nav.name" class="nav-item">
             <a-tooltip placement="bottomLeft" trigger="click" class="main-header-tooltip">
                 <span class="nav-item__label" @click="handleTo(nav)"> {{ nav.name }} </span>
-                <template #title>
+                <template #title v-if="nav.name !== '首页'">
                     <div class="nav-item__list" v-if="nav.children && nav.children.length">
                         <div v-for="child in nav.children" :class="['nav', { active: activeName === child.name }]"
                             @click.native="handleTo(child)">
@@ -57,13 +57,12 @@ const activeName = computed(() => {
     .nav-item {
         position: relative;
         margin-right: 20px;
-
+        &__label{
+            cursor: pointer;
+        }
         &:first-child {
             margin-right: auto;
         }
-
-
-
     }
 }
 

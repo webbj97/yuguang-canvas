@@ -21,10 +21,9 @@ function init() {
     }
 }
 
-const max = 100;
-const min = 0;
 const base = reactive({
-    r: max / 2
+    r: 50,
+    radian: 180,
 })
 
 function draw() {
@@ -42,7 +41,7 @@ function draw() {
         // gradient.addColorStop(1, "white");
         // ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(base.r, base.r, base.r, 0, 2 * Math.PI);
+        ctx.arc(base.r, base.r, base.r, 0, base.radian * (Math.PI / 180));
         ctx.fill();
     }
 }
@@ -50,7 +49,6 @@ function draw() {
 onMounted(() => {
     init();
     draw();
-    console.log(111);
 })
 
 watch(
@@ -69,8 +67,12 @@ watch(
         <div class="wrapper">
             <h4>fillRect（{{ base.r }}, {{ base.r }}, {{ base.r }}, 0, 2π）</h4>
             <div class="row">
-                <label>width：</label>
-                <a-slider id="test" :max="max" :min="min" v-model:value="base.r" />
+                <label>半径：</label>
+                <a-slider id="test" :max="100" :min="20" v-model:value="base.r" />
+            </div>
+            <div class="row">
+                <label>弧度：</label>
+                <a-slider id="test" :max="360" :min="0" v-model:value="base.radian" />
             </div>
         </div>
         <div id="container">
@@ -78,7 +80,6 @@ watch(
         </div>
     </div>
 </template>
-
 <style lang="less" scoped>
 .page-canvas-2 {
     position: relative;
@@ -88,7 +89,7 @@ watch(
     .wrapper {
         padding: 20px;
         width: 100%;
-        max-width: 300px;
+        max-width: 320px;
         background: #ECEFFF;
         border-radius: 16px;
 
@@ -102,7 +103,8 @@ watch(
         }
 
         label {
-            width: 55px
+            width: 55px;
+            flex-shrink: 0;
         }
     }
 

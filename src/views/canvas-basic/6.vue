@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, reactive } from 'vue'
-import { object } from 'vue-types';
 
 const config: { x: number, y: number } = { x: 0, y: 0 };
+const base = reactive({
+    x: 0,
+    y: 0,
+})
 
 function init() {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -23,20 +26,7 @@ function init() {
     }
 }
 
-const options = [
-    { label: 'left', value: 'left' },
-    { label: 'right', value: 'right' },
-    { label: 'center', value: 'center' },
-    { label: 'start', value: 'start' },
-    { label: 'end', value: 'end' },
-];
-const base = reactive({
-    x: 300,
-    y: 50,
-    fill: false,
-    font: 50,
-    align: 'left'
-})
+
 
 function start() {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -46,26 +36,40 @@ function start() {
             return;
         }
         ctx.clearRect(0, 0, config.x, config.y)
-        ctx.textAlign = base.align as CanvasTextAlign;
-        ctx.font = `${base.font}px serif`;
-        ctx.fillText('Canvas!', 200, 200, 400)
 
-        // 两条相互垂直的辅助线，两条线的交点为文本绘制的起始点：
-        ctx.beginPath()
-        ctx.moveTo(200, 0)
-        ctx.lineTo(200, 400)
-        ctx.setLineDash([10])
+        ctx.moveTo(100, 100)
+        ctx.lineTo(600, 100)
+       
+        ctx.shadowColor = '#ccc' // 设置阴影颜色
+        ctx.shadowBlur = 3 // 设置阴影模糊度
+        ctx.lineWidth = 6;
+
+        ctx.shadowOffsetX = base.x * 0.5 // 向x轴正方向平移10像素
+        ctx.shadowOffsetY = base.y * 0.5  // 向y轴正方向平移10像素
+        
         ctx.stroke()
-        ctx.beginPath()
-        ctx.moveTo(0, 200)
-        ctx.lineTo(400, 200)
+        // 绘制一个带阴影的矩形：
+        ctx.fillRect(100, 150, 100, 50)
+        // 绘制带阴影的文本：
+        ctx.lineWidth = 1
+        ctx.font = '30px Verdana'
+        ctx.strokeText('Hello Canvas!', 300, 190, 400)
+        // 绘制带阴影的圆：
+        ctx.beginPath();
+
+        ctx.shadowOffsetX = base.x * -1 // 向x轴负方向平移20像素
+        ctx.shadowOffsetY = base.y * -1 // 向y轴负方向平移20像素
+        ctx.shadowColor = 'skyblue' // 设置阴影颜色为天蓝色
+        ctx.shadowBlur = 9 // 设置阴影模糊度
+        ctx.lineWidth = 5
+        ctx.arc(350, 400, 100, 0, 2 * Math.PI)
         ctx.stroke()
     }
 }
 
 onMounted(() => {
     init();
-    start()
+    start();
 })
 
 watch(
@@ -83,14 +87,14 @@ watch(
     <div class="page-canvas-6 page-canvas">
         <div class="page-canvas__left">
             <div class="wrapper">
-                <h2>控制面板</h2>
+                <h3>控制面板</h3>
                 <div class="row">
-                    <label>大小：</label>
-                    <a-slider :max="80" :min="30" v-model:value="base.font" />
+                    <label>x偏移：</label>
+                    <a-slider :max="20" :min="0" v-model:value="base.x" />
                 </div>
                 <div class="row">
-                    <label>对齐：</label>
-                    <a-radio-group v-model:value="base.align" :options="options" />
+                    <label>y偏移：</label>
+                    <a-slider :max="20" :min="0" v-model:value="base.y" />
                 </div>
             </div>
         </div>
@@ -109,13 +113,14 @@ watch(
     .wrapper {
         padding: 20px;
         width: 100%;
-        max-width: 300px;
+        max-width: 320px;
         background: #ECEFFF;
         border-radius: 16px;
 
         .row {
             display: flex;
-            label{
+
+            label {
                 width: 100px;
             }
         }

@@ -20,10 +20,10 @@ function init() {
     config.x = w / 2
     config.y = w / 2
     const canvasRef = document.getElementById('canvas') as HTMLCanvasElement;
-    canvasRef.addEventListener('mousemove', (e) => {
+    canvasRef.onpointermove = (e) => {
         pointer.x = e.offsetX
         pointer.y = e.offsetY;
-    })
+    }
     if (canvasRef) {
         const ctx = canvasRef.getContext('2d');
         if (!ctx) {
@@ -92,14 +92,9 @@ onUnmounted(() => {
 
 <template>
     <div class="page-canvas-3">
-        <p>渲染上下文：ctx</p>
         <p>定义速度</p>
-        <p>定义撞墙反弹</p>
-        <p>填充颜色</p>
-        <p>添加canvas监听事件，获取鼠标相对位置</p>
-        <p>判断偏移量在合理范围，控制小球</p>
-        <p>上下左右边界检测</p>
-        <p>鼠标吸附效果</p>
+        <p>撞墙反弹</p>
+        <p>鼠标偏移吸附</p>
         <canvas id="canvas"></canvas>
     </div>
 
