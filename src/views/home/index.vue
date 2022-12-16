@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, ref, Ref, onMounted } from 'vue'
+import { nextTick, ref, Ref, onMounted, onUnmounted } from 'vue';
+import CanvasBg from './bg';
 
 
 const state = ref({ name: 'yuguang', age: 25 })
@@ -15,6 +16,17 @@ interface funcType {
 	<T>(arg: T): T;
 }
 
+let canvas: any;
+
+onMounted(() => {
+	canvas = new CanvasBg('.home-page');
+	canvas.init();
+	canvas.draw();
+})
+onUnmounted(() => {
+	canvas.cancel();
+})
+
 </script>
 
 <template>
@@ -28,11 +40,16 @@ interface funcType {
 				{{ item.action }}
 			</div>
 		</section>
+
+		<canvas id="canvas"></canvas>
 	</div>
 </template>
 
 <style lang="less" scoped>
 .home-page {
+	position: relative;
+	height: 100%;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -69,6 +86,12 @@ interface funcType {
 			font-size: 14px;
 			font-weight: 500;
 		}
+	}
+
+	#canvas {
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 }
 </style>

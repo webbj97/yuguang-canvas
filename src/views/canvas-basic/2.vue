@@ -65,7 +65,7 @@ watch(
 <template>
     <div class="page-canvas-2">
         <div class="wrapper">
-            <h4>fillRect（{{ base.r }}, {{ base.r }}, {{ base.r }}, 0, 2π）</h4>
+            <h4>arc（{{ base.r }}, {{ base.r }}, {{ base.r }}, 0, 2π）</h4>
             <div class="row">
                 <label>半径：</label>
                 <a-slider id="test" :max="100" :min="20" v-model:value="base.r" />

@@ -46,7 +46,9 @@ function start() {
             ctx.lineWidth = base.lineWidth - i;
             ctx.lineJoin = lineJoin[i] as CanvasLineJoin;
             ctx.beginPath();
+
             ctx.moveTo(0, 5 + i * base.x);
+
             ctx.lineTo(40, 45 + i * base.x);
             ctx.lineTo(80, 5 + i * base.x);
             ctx.lineTo(120, 45 + i * base.x);

@@ -10,7 +10,6 @@ import {
     RightSquareTwoTone,
 } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-import { object } from 'vue-types';
 
 interface formT {
     type: string,
@@ -55,9 +54,7 @@ class History {
         return this.cacheQueue.length;
     }
     reset() {
-        this.cacheQueue = [];
         this.currentStep = 0;
-        this.step = 0;
     }
     add(h: HistoryEntry) {
         this.cacheQueue = this.cacheQueue.slice(0, this.currentStep)
@@ -65,12 +62,13 @@ class History {
 
         this.step = this.getLength();
         this.currentStep = this.getLength();
+        console.log(this.cacheQueue, this.currentStep);
     }
     getCache(i: number) {
+        console.log(this.cacheQueue, this.currentStep);
         return this.cacheQueue[i]
     }
 }
-
 
 class PaintBoard {
     ctx: CanvasRenderingContext2D
