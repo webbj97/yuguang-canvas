@@ -6,6 +6,12 @@ const base = reactive({
     x: 0, y: 0, width: 100, height: 100, fillStyle: '#12de74'
 })
 
+// const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+// const ctx = canvas.getContext('2d');
+// <canvas id="canvas"></canvas>
+
+// ctx
+
 function init() {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const wrapper = document.getElementById('container') as HTMLElement;

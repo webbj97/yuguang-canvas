@@ -153,11 +153,4 @@ function lerp(start: number, end: number) {
     return start + (end - start) * 0.1; // 0.1 = 过渡速率
 }
 
-function init() {
-    const canvas = new Canvas();
-    canvas.init();
-    console.log("canvas", canvas);
-    canvas.draw();
-}
-
 export default Canvas;
